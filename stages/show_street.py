@@ -11,12 +11,16 @@ pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 
 # get path to our cleaned file
-address_in = pathlib.Path('.').absolute() / 'files/clean'
-address_out = pathlib.Path('.').absolute() / 'files/analytical'
+address_font = pathlib.Path('.').resolve().parents[0] / 'fonts/arial.ttf'
+address_in = pathlib.Path('.').resolve().parents[0] / 'files/clean'
+address_out = pathlib.Path('.').resolve().parents[0] / 'files/analytical'
 
 file = f.get_first_file(address_in)
 
 if __name__ == "__main__":
+    print(address_in)
+    print(address_out)
+    print(address_font)
     staging_exists = address_in.exists() and address_out.exists()
     f.check_staging(staging_exists)
     if file == '':
@@ -24,7 +28,7 @@ if __name__ == "__main__":
         exit(0)
     f.clear_dir(address_out)
     use_proxy = f.needs_proxy()
-    pdf = f.create_pdf()
+    pdf = f.create_pdf(address_font)
     columnz = ['link', 'street', 'rooms', 'floor', 'm2', 'house_type', 'price_2', 'com_type']
     df_full = pd.read_csv(file, header=0, sep=';')
     df_out, regions = agg.get_streets_short(df_full)

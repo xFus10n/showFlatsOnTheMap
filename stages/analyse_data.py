@@ -11,13 +11,13 @@ pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 
 # get path to our cleaned file
-address_in = pathlib.Path('.').absolute()/'files/clean'
-address_out = pathlib.Path('.').absolute()/'files/analytical'
+address_font = pathlib.Path('.').resolve().parents[0] / 'fonts/arial.ttf'
+address_in = pathlib.Path('.').resolve().parents[0] / 'files/clean'
+address_out = pathlib.Path('.').resolve().parents[0] / 'files/analytical'
 
 file = f.get_first_file(address_in)
 
 if __name__ == "__main__":
-
     staging_exists = address_in.exists() and address_out.exists()
     f.check_staging(staging_exists)
     if file == '':
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     use_proxy = f.needs_proxy()
     show = f.show_charts()
     df_full = pd.read_csv(file, header=0, sep=';')
-    pdf = f.create_pdf()
+    pdf = f.create_pdf(address_font)
 
     # reducing zones
     df_com, zones = agg.get_top_zones(df_full)
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     print(c(caption, "yellow"), c('done', 'green'))
 
     # geo
-    columns_for_top_10 = ['region', 'street', 'rooms', 'floor', 'top_floor', 'm2', 'house_type', 'price_2']
+    columns_for_top_10 = ['link', 'com_type', 'region', 'street', 'rooms', 'floor', 'top_floor', 'm2', 'house_type', 'price_2']
     df_max = agg.max_top_n(df_full, columns_for_top_10, 'sell', 10)
     df_max = f.get_geo_data(df_max, use_proxy=use_proxy)
     # print(df_max.to_string(index=False))

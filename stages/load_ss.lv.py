@@ -1,6 +1,6 @@
 import pathlib
 from datetime import datetime
-from lessons.home.utilz import functions as f
+from utilz import functions as f
 from termcolor import colored as c
 
 if __name__ == "__main__":
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     count = f.how_many_pages_2_download("enter the number of pages to load: ")
     use_proxy = f.needs_proxy()
 
-    location_out = pathlib.Path('.').absolute()/'files/raw'
+    location_out = pathlib.Path('..').absolute() / 'files/raw'
 
     # use datetime as name if empty
     date_now = datetime.now().strftime("%Y%m%d%H%M%S")

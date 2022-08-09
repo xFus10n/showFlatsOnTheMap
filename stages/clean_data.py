@@ -2,7 +2,7 @@ import pathlib
 import pandas as pd
 import warnings
 
-from lessons.home.utilz import functions as f
+from utilz import functions as f
 from termcolor import colored as c
 from datetime import datetime
 
@@ -15,8 +15,8 @@ pd.set_option('display.max_colwidth', None)
 
 if __name__ == "__main__":
 
-    address_in = pathlib.Path('.').absolute()/'files/raw'
-    address_out = pathlib.Path('.').absolute()/'files/clean'
+    address_in = pathlib.Path('..').absolute() / 'files/raw'
+    address_out = pathlib.Path('..').absolute() / 'files/clean'
 
     date_now = datetime.now().strftime("%Y%m%d%H%M%S")
     warnings.simplefilter(action='ignore', category=FutureWarning)

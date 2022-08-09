@@ -61,7 +61,14 @@ def check_staging(both_exist):
 
 def create_pdf():
     pdf = fpdf.FPDF(orientation='P', unit='mm', format='A4')
-    pdf.add_font('Arial', '', './fonts/arial.ttf', uni=True)
+    pdf.add_font('Arial', '', '../fonts/arial.ttf', uni=True)
+    pdf.set_font('Arial', '', 10)
+    return pdf
+
+
+def create_pdf(address_font):
+    pdf = fpdf.FPDF(orientation='P', unit='mm', format='A4')
+    pdf.add_font('Arial', '', address_font, uni=True)
     pdf.set_font('Arial', '', 10)
     return pdf
 
