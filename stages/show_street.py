@@ -43,7 +43,9 @@ def main():
     df_reg = df_out.query(f'region == "{key_reg}"')
     # print(df_reg)
     # ask for street
-    df_street = df_reg['street_short'].drop_duplicates().sort_values(ascending=True).reset_index(drop=True)
+    # df_street = df_reg['street_short'].drop_duplicates().sort_values(ascending=True).reset_index(drop=True)
+    df_street = df_reg.groupby(['street_short'])\
+        .agg(count=pd.NamedAgg(column="street_short", aggfunc="count")).reset_index()
     print(df_street)
     try:
         position = int(input(c(f"Choose street ", "green") + c("(empty = all)", "blue") + c(" : ", "green")))
@@ -53,7 +55,7 @@ def main():
     if position is None:
         df = df_reg
     else:
-        key = df_street.iloc[[position]].tolist()[0]
+        key = df_street['street_short'].iloc[[position]].tolist()[0]
         df = df_reg.query(f'street_short == "{key}"')
     # get geo data
     df_geo = f.get_geo_data(df[columnz], use_proxy=use_proxy)
