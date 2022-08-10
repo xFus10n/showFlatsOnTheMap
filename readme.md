@@ -29,6 +29,8 @@ These folders being used for data processing.
 
 **NOTE: Scripts location and folder structure should be preserved** 
 
+**NOTE: If your connection is under proxy, re-implement *utilz.functions.get_proxies* function** 
+
 * ###Load
   For data download run [load](stages/load_ss_lv.py) script.
   User can specify a file name, number of pages to download and either the connection is under proxy.
@@ -43,3 +45,5 @@ These folders being used for data processing.
   connection requires proxy and wether you wan to pop up the plots. The output files will be
   saved in *analytical* folder. The folder will be cleared prior saving. Summary can be found in 
   *data.pdf* file. NOTE: There are clickable areas on the pdf for maps pop-up (*top_10_sell_map, top_10_rent_map, top_10_rent_day_map*)
+* ###main
+  Runs all stages
