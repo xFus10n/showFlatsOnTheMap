@@ -5,6 +5,8 @@ from termcolor import colored as c
 
 
 def main():
+    global use_proxy
+
     # fixed address
     address_0 = "https://www.ss.lv/lv/real-estate/flats/riga/all/"
     # starting page
@@ -12,10 +14,10 @@ def main():
     # user input
     file_name = str(input("enter file name without extension (leave empty for datetime): "))
     count = f.how_many_pages_2_download("enter the number of pages to load: ")
-    use_proxy = f.needs_proxy()
 
     # set path correctly
     if __name__ == '__main__':
+        use_proxy = f.needs_proxy()
         location_out = pathlib.Path('..').absolute() / 'files/raw'
     else:
         location_out = pathlib.Path('.').absolute() / 'files/raw'
