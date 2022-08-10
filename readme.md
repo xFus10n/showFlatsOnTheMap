@@ -30,7 +30,7 @@ These folders being used for data processing.
 **NOTE: Scripts location and folder structure should be preserved** 
 
 * ###Load
-  For data download run [load](stages/load_ss.lv.py) script.
+  For data download run [load](stages/load_ss_lv.py) script.
   User can specify a file name, number of pages to download and either the connection is under proxy.
   Proxies can be specified in here : **./utilz/functions.get_proxies**. Multiple
   files allowed (deduplication happens on the next stage). If number of pages are less than user have specified, script will stop 

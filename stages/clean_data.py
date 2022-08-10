@@ -30,7 +30,7 @@ if __name__ == "__main__":
         exit(1)
 
     if len(list(address_in.glob("./*.csv"))) == 0:
-        print(c('Input folder is empty, run load_ss.lv.py script first', 'red'))
+        print(c('Input folder is empty, run load_ss_lv.py script first', 'red'))
         exit(0)
 
     # log counts and clear drop zone
