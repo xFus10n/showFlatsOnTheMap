@@ -299,7 +299,7 @@ def load_page(address, page_number, file_name, proxy=False):
     info = []  # info holder
 
     if page.status_code == 200:
-        print(c(f"\rconnection success", "yellow"), end=c(" => ", "yellow"))
+        # print(c(f"connection success", "yellow"), end=c(" => ", "yellow"))
         page_content = bs4.BeautifulSoup(page.content, "html.parser")
 
         # Get Data
@@ -310,7 +310,20 @@ def load_page(address, page_number, file_name, proxy=False):
 
             # find elements
             link = table_row.find("a", class_="am")
-            if link is not None: current_info.append("https://ss.lv" + link.attrs["href"])
+            if link is not None:
+                extracted_link = "https://ss.lv" + link.attrs["href"]
+                current_info.append(extracted_link)
+
+                # date
+                internal_page = get_page(extracted_link, proxy)
+                if internal_page.status_code == 200:
+                    internal_page_content = bs4.BeautifulSoup(internal_page.content, "html.parser")
+                    elements = internal_page_content.find_all("td", class_="msg_footer")
+                    try:
+                        date_raw = elements[2].string
+                    except Exception as e:
+                        date_raw = "Datums: 01.01.1970 00:00"
+
             short_text = table_row.find("a", class_="am")
             if short_text is not None: current_info.append(short_text.string)
             other_items = table_row.find_all(class_="msga2-o pp6")
@@ -328,17 +341,17 @@ def load_page(address, page_number, file_name, proxy=False):
                     v3 = item.text
                     if v3 is not None:
                         current_info.append(v3)
+            current_info.append(date_raw)
             info.append(current_info)
     else:
         print(c("Error", "red"))
 
     # print array
     # show(info, True)
-    df = create_dataframe(info, ['link', 'description', 'street', 'rooms', 'm2', 'floor', 'house_type', 'price'])
+    df = create_dataframe(info, ['link', 'description', 'street', 'rooms', 'm2', 'floor', 'house_type', 'price', 'date'])
 
     # print(df)
-    current_dt = datetime.now().strftime("%Y%m%d")
-    print(c(f"page: {page_number} loaded ...", "green"), end='')
+    print(c(f"\rConnection success:", "yellow"), c(f"page: {page_number} loaded ...", "green"), end='')
     save_as_csv(df, file_name)
 
 
@@ -361,6 +374,12 @@ def check_if_value_is_subset_of_string(value: string):
 
 def split_street(df):
     df[['region', 'street']] = df.street.str.split("::", expand=True)
+    return df
+
+
+def refine_date(df):
+    df['date'] = df['date'].str.replace('Datums: ', '')
+    df['date'] = pandas.to_datetime(df['date'], format='%d.%m.%Y %H:%M')
     return df
 
 

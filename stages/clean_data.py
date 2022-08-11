@@ -45,6 +45,7 @@ def main():
     # print(df_full)
     # exit(0)
     df_full.drop_duplicates(inplace=True, ignore_index=True)
+    df_full = f.refine_date(df_full)
     df_full = f.split_street(df_full)
     df_full = f.split_floor(df_full)
     # price fix
