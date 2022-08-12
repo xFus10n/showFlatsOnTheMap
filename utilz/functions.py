@@ -205,6 +205,11 @@ def needs_proxy():
     return proxy.lower() == 'y'
 
 
+def download_new_data():
+    proxy = str(input('Download new data? (y/n) : '))
+    return proxy.lower() == 'y'
+
+
 def show_charts():
     proxy = str(input('Show charts (y/n) : '))
     return proxy.lower() == 'y'
