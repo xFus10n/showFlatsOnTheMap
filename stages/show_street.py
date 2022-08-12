@@ -45,7 +45,7 @@ def main():
     # ask for street
     df_street = pd.crosstab(df_reg.street_short, df_reg.color).reset_index()
     df_street.index.names = ['index']
-    # print(df_street)
+    print(df_street)
 
     try:
         position = int(input(c(f"Choose street ", "green") + c("(empty = all)", "blue") + c(" : ", "green")))

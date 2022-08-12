@@ -49,6 +49,8 @@ def main():
     # print(df_full[:1000])
     # exit(0)
     df_full = f.split_street(df_full)
+    df_full = f.exception_streets(df_full)
+
     df_full = f.split_floor(df_full)
     # price fix
     df_full['price_2'] = df_full.price.str.replace("€", "")  # fixme: na=False

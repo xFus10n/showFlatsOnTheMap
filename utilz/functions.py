@@ -389,6 +389,11 @@ def split_street(df):
     return df
 
 
+def exception_streets(df):
+    df['street'] = df['street'].str.replace('Viestura pr.', 'Viestura')
+    return df
+
+
 def refine_date(df):
     df['date'] = df['date'].str.replace('Datums: ', '')
     df['date'] = pandas.to_datetime(df['date'], format='%d.%m.%Y %H:%M')
