@@ -33,7 +33,7 @@ def main():
         exit(0)
     f.clear_dir(address_out)
     pdf = f.create_pdf(address_font)
-    columnz = ['link', 'street', 'rooms', 'floor', 'm2', 'house_type', 'price_2', 'com_type']
+    columnz = ['link', 'street', 'rooms', 'floor', 'm2', 'house_type', 'price_2', 'com_type', 'date']
     df_full = pd.read_csv(file, header=0, sep=';')
     df_out, regions = agg.get_streets_short(df_full)
     # ask for region input
@@ -41,9 +41,8 @@ def main():
     position = input(c(f"Choose region: ", "green"))
     key_reg = regions.iloc[[position]].tolist()[0]
     df_reg = df_out.query(f'region == "{key_reg}"')
-    # print(df_reg)
+
     # ask for street
-    # df_street = df_reg['street_short'].drop_duplicates().sort_values(ascending=True).reset_index(drop=True)
     df_street = df_reg.groupby(['street_short'])\
         .agg(count=pd.NamedAgg(column="street_short", aggfunc="count")).reset_index()
     print(df_street)

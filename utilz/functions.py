@@ -75,7 +75,7 @@ def create_pdf(address_font):
 
 def log_data_pdf(pdf, data_frame):
     short_cols = ('rooms', 'floor', 'm2')
-    long_cols = 'street'
+    long_cols = ('street', 'date')
     omit_columns = 'link'
     real_width = pdf.w - 2 * pdf.l_margin
     column_width = real_width / len(data_frame.columns)
@@ -88,7 +88,7 @@ def log_data_pdf(pdf, data_frame):
         elif col in short_cols:
             pdf.cell(column_width / 2, row_hight, str(col), border=1, align='C')
         elif col in long_cols:
-            pdf.cell(column_width * 1.5, row_hight, str(col), border=1, align='C')
+            pdf.cell(column_width * 1.6, row_hight, str(col), border=1, align='C')
         else:
             pdf.cell(column_width, row_hight, str(col), border=1, align='C')
     pdf.ln()
@@ -101,7 +101,7 @@ def log_data_pdf(pdf, data_frame):
             elif col in short_cols:
                 pdf.cell(column_width / 2, row_hight, str(data_frame[col].iloc[i]), border=1)
             elif col in long_cols:
-                pdf.cell(column_width * 1.5, row_hight, str(data_frame[col].iloc[i]), border=1)
+                pdf.cell(column_width * 1.6, row_hight, str(data_frame[col].iloc[i]), border=1)
             else:
                 pdf.cell(column_width, row_hight, str(data_frame[col].iloc[i]), border=1)
         pdf.ln()
@@ -134,12 +134,13 @@ def create_map_html(data_frame, path_2_analytical_dir, name):
                  + '<b>Building Type:</b> ' + df['house_type'].map(str) + ',<br>'\
                  + '<b>Area:</b> ' + df['m2'].map(str) + '(m2),<br>'\
                  + '<b>Price:</b> ' + df['price_2'].map(str) + '(EUR),<br>'\
+                 + '<b>Date:</b> ' + df['date'].map(str) + ',<br>'\
                  + '<b>Link:</b> <a href="' + df['link'].map(str) + '" target="_blank">source</a>'
     try:
         mapx = folium.Map(location=[df.lat.mean(), df.long.mean()], zoom_start=14, control_scale=True)
         for index, location_info in df.iterrows():
             iframe = folium.IFrame(location_info['info'])
-            popup = folium.Popup(iframe, min_width=220, max_width=300)
+            popup = folium.Popup(iframe, min_width=250, max_width=350)
             folium.Marker([location_info["lat"], location_info["long"]], popup=popup).add_to(mapx)
         full_html_name = f"{path_2_analytical_dir}/{name}.html"
         mapx.save(full_html_name)
@@ -321,7 +322,7 @@ def load_page(address, page_number, file_name, proxy=False):
                     elements = internal_page_content.find_all("td", class_="msg_footer")
                     try:
                         date_raw = elements[2].string
-                    except Exception as e:
+                    except IndexError as ie:
                         date_raw = "Datums: 01.01.1970 00:00"
 
             short_text = table_row.find("a", class_="am")
