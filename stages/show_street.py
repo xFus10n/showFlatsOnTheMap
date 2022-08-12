@@ -33,7 +33,7 @@ def main():
         exit(0)
     f.clear_dir(address_out)
     pdf = f.create_pdf(address_font)
-    columnz = ['link', 'street', 'rooms', 'floor', 'm2', 'house_type', 'price_2', 'com_type', 'date']
+    columnz = ['link', 'street', 'rooms', 'floor', 'm2', 'house_type', 'price_2', 'com_type', 'date', 'color']
     df_full = pd.read_csv(file, header=0, sep=';')
     df_out, regions = agg.get_streets_short(df_full)
     # ask for region input

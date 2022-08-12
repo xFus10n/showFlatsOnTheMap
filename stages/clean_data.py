@@ -42,10 +42,12 @@ def main():
     else:
         print(c("unique rows before upload: ", "green"), c(str(0), "yellow"))
     df_full = f.get_csv_files(address_in)
-    # print(df_full)
-    # exit(0)
     df_full.drop_duplicates(inplace=True, ignore_index=True)
     df_full = f.refine_date(df_full)
+    df_full = f.set_date_color(df_full)
+
+    # print(df_full[:1000])
+    # exit(0)
     df_full = f.split_street(df_full)
     df_full = f.split_floor(df_full)
     # price fix

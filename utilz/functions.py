@@ -1,5 +1,7 @@
 import pathlib
 import string
+
+import numpy
 import pandas
 import folium
 import requests as req
@@ -76,7 +78,7 @@ def create_pdf(address_font):
 def log_data_pdf(pdf, data_frame):
     short_cols = ('rooms', 'floor', 'm2')
     long_cols = ('street', 'date')
-    omit_columns = 'link'
+    omit_columns = ('link', 'color')
     real_width = pdf.w - 2 * pdf.l_margin
     column_width = real_width / len(data_frame.columns)
     row_hight = pdf.font_size * 2
@@ -88,7 +90,7 @@ def log_data_pdf(pdf, data_frame):
         elif col in short_cols:
             pdf.cell(column_width / 2, row_hight, str(col), border=1, align='C')
         elif col in long_cols:
-            pdf.cell(column_width * 1.6, row_hight, str(col), border=1, align='C')
+            pdf.cell(column_width * 1.8, row_hight, str(col), border=1, align='C')
         else:
             pdf.cell(column_width, row_hight, str(col), border=1, align='C')
     pdf.ln()
@@ -101,7 +103,7 @@ def log_data_pdf(pdf, data_frame):
             elif col in short_cols:
                 pdf.cell(column_width / 2, row_hight, str(data_frame[col].iloc[i]), border=1)
             elif col in long_cols:
-                pdf.cell(column_width * 1.6, row_hight, str(data_frame[col].iloc[i]), border=1)
+                pdf.cell(column_width * 1.8, row_hight, str(data_frame[col].iloc[i]), border=1)
             else:
                 pdf.cell(column_width, row_hight, str(data_frame[col].iloc[i]), border=1)
         pdf.ln()
@@ -141,7 +143,8 @@ def create_map_html(data_frame, path_2_analytical_dir, name):
         for index, location_info in df.iterrows():
             iframe = folium.IFrame(location_info['info'])
             popup = folium.Popup(iframe, min_width=250, max_width=350)
-            folium.Marker([location_info["lat"], location_info["long"]], popup=popup).add_to(mapx)
+            folium.Marker([location_info["lat"], location_info["long"]],
+                          popup=popup, icon=folium.Icon(color=location_info['color'])).add_to(mapx)
         full_html_name = f"{path_2_analytical_dir}/{name}.html"
         mapx.save(full_html_name)
     except AttributeError as e:
@@ -381,6 +384,17 @@ def split_street(df):
 def refine_date(df):
     df['date'] = df['date'].str.replace('Datums: ', '')
     df['date'] = pandas.to_datetime(df['date'], format='%d.%m.%Y %H:%M')
+    return df
+
+
+def set_date_color(df):
+    current_date = pandas.datetime.now()
+    df['date_diff'] = current_date - df['date']
+    df['date_diff'] = df['date_diff'] / numpy.timedelta64(1, 'D')
+    df.loc[df['date_diff'] <= 1, 'color'] = 'red'
+    df.loc[(df['date_diff'] > 1) & (df['date_diff'] <= 2), 'color'] = 'orange'
+    df.loc[(df['date_diff'] > 2) & (df['date_diff'] <= 5), 'color'] = 'green'
+    df.loc[df['date_diff'] > 5, 'color'] = 'black'
     return df
 
 
