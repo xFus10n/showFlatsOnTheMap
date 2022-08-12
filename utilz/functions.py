@@ -130,6 +130,9 @@ def get_proxies():
 def create_map_html(data_frame, path_2_analytical_dir, name):
     full_html_name = ''
     data_frame_clear = data_frame.dropna()
+    if len(data_frame_clear) == 0:
+        print(c("error deleting NaNs", "red"))
+        exit(1)
     df = data_frame_clear.copy()
     df['info'] = '<b>Commercial Type:</b> ' + df['com_type'].map(str) + ',<br>'\
                  + '<b>Location:</b> ' + df['street'].map(str) + ',<br>'\

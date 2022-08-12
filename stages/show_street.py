@@ -43,9 +43,10 @@ def main():
     df_reg = df_out.query(f'region == "{key_reg}"')
 
     # ask for street
-    df_street = df_reg.groupby(['street_short'])\
-        .agg(count=pd.NamedAgg(column="street_short", aggfunc="count")).reset_index()
-    print(df_street)
+    df_street = pd.crosstab(df_reg.street_short, df_reg.color).reset_index()
+    df_street.index.names = ['index']
+    # print(df_street)
+
     try:
         position = int(input(c(f"Choose street ", "green") + c("(empty = all)", "blue") + c(" : ", "green")))
     except ValueError as ve:
@@ -57,6 +58,7 @@ def main():
         key = df_street['street_short'].iloc[[position]].tolist()[0]
         df = df_reg.query(f'street_short == "{key}"')
     # get geo data
+    # print(df)
     df_geo = f.get_geo_data(df[columnz], use_proxy=use_proxy)
     f.log_dataframe_with_geo_data(df_geo, address_out, str(key_reg).upper(), 'show_map', pdf, new_page=True)
     pdf.output(address_out / 'data.pdf')
