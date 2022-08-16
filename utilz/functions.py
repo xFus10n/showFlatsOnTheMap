@@ -324,9 +324,20 @@ def load_page(address, page_number, proxy=False):
                     current_info.append(room.text)
 
                     # m2
+                    m2 = internal_page_content.find("td", class_="ads_opt",  id="tdo_3")
+                    current_info.append(m2.text.replace(" m²", ""))
+
                     # floor
+                    floor = internal_page_content.find("td", class_="ads_opt",  id="tdo_4")
+                    current_info.append(floor.text.replace("/lifts", ""))
+
                     # house type
+                    house = internal_page_content.find("td", class_="ads_opt", id="tdo_6")
+                    current_info.append(house.text)
+
                     # price
+                    price = internal_page_content.find("td", class_="ads_price", id="tdo_8")
+                    current_info.append(price.text)
 
                     # date
                     street = internal_page_content.find_all("td", class_="msg_footer")
