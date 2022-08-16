@@ -18,7 +18,7 @@ def main():
     # set path correctly
     if __name__ == '__main__':
         use_proxy = f.needs_proxy()
-        location_out = pathlib.Path('..').absolute() / 'files/rloaw'
+        location_out = pathlib.Path('..').absolute() / 'files/raw'
     else:
         location_out = pathlib.Path('.').absolute() / 'files/raw'
 
@@ -36,7 +36,7 @@ def main():
     output = location_out / f'{file_name}.csv'
     while True:
         address = f"{address_0}page{page}.html"
-        status, data = f.load_page(address, page, output, proxy=use_proxy)
+        status, data = f.load_page(address, page, proxy=use_proxy)
         if status != 0:
             df_list.append(data)
             if page < count:

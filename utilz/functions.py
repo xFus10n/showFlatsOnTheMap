@@ -275,7 +275,7 @@ def get_page(addr, use_proxy=False):
     return page
 
 
-def load_page(address, page_number, file_name, proxy=False):
+def load_page(address, page_number, proxy=False):
     # load the page
     page = get_page(address, proxy)
 
@@ -298,6 +298,11 @@ def load_page(address, page_number, file_name, proxy=False):
 
             # find elements
             link = table_row.find("a", class_="am")
+
+            # short text
+            short_text = table_row.find("a", class_="am")
+            if short_text is not None: current_info.append(short_text.string)
+
             if link is not None:
                 extracted_link = "https://ss.lv" + link.attrs["href"]
                 current_info.append(extracted_link)
@@ -306,12 +311,30 @@ def load_page(address, page_number, file_name, proxy=False):
                 if internal_page.status_code == 200:
                     internal_page_content = bs4.BeautifulSoup(internal_page.content, "html.parser")
 
+                    # region
+                    region = internal_page_content.find("td", class_="ads_opt", id="tdo_856")
+                    current_info.append(region.text)
+
+                    # street todo: AttributeError: 'NoneType' object has no attribute 'text'
+                    street = internal_page_content.find("td", class_="ads_opt",  id="tdo_11")
+                    current_info.append(street.text.replace(" [Karte]", ""))
+
+                    # room
+                    room = internal_page_content.find("td", class_="ads_opt", id="tdo_1")
+                    current_info.append(room.text)
+
+                    # m2
+                    # floor
+                    # house type
+                    # price
+
                     # date
-                    elements = internal_page_content.find_all("td", class_="msg_footer")
+                    street = internal_page_content.find_all("td", class_="msg_footer")
                     try:
-                        date_raw = elements[2].string
+                        date_raw = street[2].string
                     except IndexError as ie:
                         date_raw = "Datums: 01.01.1970 00:00"
+                    current_info.append(date_raw)
 
                     # location
                     coordinates_element = internal_page_content.find("a", class_="ads_opt_link_map")
@@ -319,41 +342,23 @@ def load_page(address, page_number, file_name, proxy=False):
                         coord_arr = coordinates_element.attrs['onclick'].split("=1&c=")[1].split(",")
                     except AttributeError as ae:
                         coord_arr = [0.0, 0.0]
-
-            short_text = table_row.find("a", class_="am")
-            if short_text is not None: current_info.append(short_text.string)
-            other_items = table_row.find_all(class_="msga2-o pp6")
-            for item in other_items:
-                if item.text != '' or None:
-                    # split region and street
-                    v1 = check_if_value_is_subset_of_string(item.text)
-                    if v1 != '':
-                        current_info.append(v1)
-                        continue
-                if item.string is not None:
-                    v2 = item.string
-                    current_info.append(v2)
-                else:
-                    v3 = item.text
-                    if v3 is not None:
-                        current_info.append(v3)
+                    current_info.append(coord_arr[0])
+                    current_info.append(coord_arr[1])
 
             # append data
-            current_info.append(date_raw)
-            current_info.append(coord_arr[0])
-            current_info.append(coord_arr[1])
             info.append(current_info)
+            print(info)
+            exit(0)
     else:
         print(c("Error", "red"))
 
     # print array
     # show(info, True)
-    df = create_dataframe(info, ['link', 'description', 'street', 'rooms', 'm2', 'floor', 'house_type', 'price', 'date', 'lat', 'long'])
+    df = create_dataframe(info, ['link', 'description', 'region', 'street', 'rooms', 'm2', 'floor', 'house_type', 'price', 'date', 'lat', 'long'])
 
     # print(df)
     print(c(f"\rConnection success:", "yellow"), c(f"page: {page_number} loaded ...", "green"), end='')
     return 1, df
-    # save_as_csv(df, file_name, verbose=True)
 
 
 def check_if_value_is_subset_of_string(value: string):
