@@ -238,6 +238,10 @@ def save_as_csv(data_frame, name_path, verbose=False):
         print(c(f"{name_path}", "yellow"))
 
 
+def list_of_df_to_csv(df_list, filename):
+    pandas.concat(df_list).to_csv(filename, index=False, encoding='utf8', sep=';')
+
+
 def clear_dir(location):
     for path in list(location.iterdir()):
         os.remove(path)
@@ -278,7 +282,7 @@ def load_page(address, page_number, file_name, proxy=False):
     # check if page are the same, not -> reached end
     if page.url != address:
         print(c("\nreached the end of pages, stopping", "yellow"))
-        return 0
+        return 0, None
 
     info = []  # info holder
 
@@ -348,7 +352,8 @@ def load_page(address, page_number, file_name, proxy=False):
 
     # print(df)
     print(c(f"\rConnection success:", "yellow"), c(f"page: {page_number} loaded ...", "green"), end='')
-    save_as_csv(df, file_name)
+    return 1, df
+    # save_as_csv(df, file_name, verbose=True)
 
 
 def check_if_value_is_subset_of_string(value: string):

@@ -18,7 +18,7 @@ def main():
     # set path correctly
     if __name__ == '__main__':
         use_proxy = f.needs_proxy()
-        location_out = pathlib.Path('..').absolute() / 'files/raw'
+        location_out = pathlib.Path('..').absolute() / 'files/rloaw'
     else:
         location_out = pathlib.Path('.').absolute() / 'files/raw'
 
@@ -32,15 +32,20 @@ def main():
         print(c("system shutdown", "red"))
         exit(1)
     # will exit after the last page
+    df_list = []
+    output = location_out / f'{file_name}.csv'
     while True:
         address = f"{address_0}page{page}.html"
-        if f.load_page(address, page, location_out / f'{file_name}.csv', proxy=use_proxy) != 0:
+        status, data = f.load_page(address, page, output, proxy=use_proxy)
+        if status != 0:
+            df_list.append(data)
             if page < count:
                 page += 1
             else:  # reached the end of requested pages
                 break
         else:  # reached the end of pages
             break
+    f.list_of_df_to_csv(df_list, output)
     print(c(f"\nSaved {file_name}.csv successfully", "blue"))
 
 
