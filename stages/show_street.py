@@ -2,7 +2,6 @@ import pathlib
 import utilz.functions as f
 import utilz.aggregations as agg
 import pandas as pd
-import kaleido
 from termcolor import colored as c
 
 pd.set_option('display.max_columns', None)
@@ -12,11 +11,9 @@ pd.set_option('display.max_colwidth', None)
 
 
 def main():
-    global use_proxy
 
     # get path to our cleaned file
     if __name__ == '__main__':
-        use_proxy = f.needs_proxy()
         address_font = pathlib.Path('.').resolve().parents[0] / 'fonts/arial.ttf'
         address_in = pathlib.Path('.').resolve().parents[0] / 'files/clean'
         address_out = pathlib.Path('.').resolve().parents[0] / 'files/analytical'
@@ -33,7 +30,7 @@ def main():
         exit(0)
     f.clear_dir(address_out)
     pdf = f.create_pdf(address_font)
-    columnz = ['link', 'street', 'rooms', 'floor', 'm2', 'house_type', 'price_2', 'com_type', 'date', 'color']
+    columnz = ['link', 'street', 'rooms', 'floor', 'm2', 'house_type', 'price_2', 'com_type', 'date', 'color', 'lat', 'long']
     df_full = pd.read_csv(file, header=0, sep=';')
     df_out, regions = agg.get_streets_short(df_full)
     # ask for region input
@@ -57,10 +54,7 @@ def main():
     else:
         key = df_street['street_short'].iloc[[position]].tolist()[0]
         df = df_reg.query(f'street_short == "{key}"')
-    # get geo data
-    # print(df)
-    df_geo = f.get_geo_data(df[columnz], use_proxy=use_proxy)
-    f.log_dataframe_with_geo_data(df_geo, address_out, str(key_reg).upper(), 'show_map', pdf, new_page=True)
+    f.log_dataframe_with_geo_data(df[columnz], address_out, str(key_reg).upper(), 'show_map', pdf, new_page=True)
     pdf.output(address_out / 'data.pdf')
 
 

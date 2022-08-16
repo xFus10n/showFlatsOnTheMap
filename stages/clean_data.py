@@ -58,7 +58,7 @@ def main():
     df_full['price_2'] = df_full.price_2.str.replace("/dienā", "")
     df_full['price_2'] = df_full.price_2.str.replace("maiņai", "")
     df_full['price_2'] = df_full.price_2.str.replace(",", "")
-    df_full = f.convert_2_num(df_full, ['rooms', 'floor', 'top_floor', 'm2', 'price_2'])
+    df_full = f.convert_2_num(df_full, ['rooms', 'floor', 'top_floor', 'm2', 'price_2', 'lat', 'long'])
     # price categorisation
     df_full.loc[df_full['price'].str.contains("€"), 'com_type'] = 'sell'
     df_full.loc[df_full['price'].str.contains("€/mēn"), 'com_type'] = 'rent'
@@ -68,7 +68,7 @@ def main():
     df_full.loc[df_full['price'].str.contains('maiņai'), 'com_type'] = 'change'
     print(c("unique rows after upload: ", "green"), c(str(len(df_full)), "yellow"))
     f.save_as_csv(df_full, address_out / f'{date_now}.csv', verbose=True)
-    # print(df_full)
+    # print(df_full[:1000])
 
 
 if __name__ == "__main__":

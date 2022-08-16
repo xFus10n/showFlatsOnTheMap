@@ -6,10 +6,8 @@ import pandas
 import folium
 import requests as req
 import bs4
-from geopy import Nominatim, Location
 import os
 from termcolor import colored as c
-from datetime import datetime
 import fpdf
 import plotly.express as px
 
@@ -156,40 +154,10 @@ def create_map_html(data_frame, path_2_analytical_dir, name):
     return full_html_name
 
 
-def get_geo_data(df_full, use_proxy=False):
-    if use_proxy:
-        geo_locator = Nominatim(user_agent="dasayx", proxies=get_proxies(), timeout=10)
-    else:
-        geo_locator = Nominatim(user_agent="dasayx", timeout=10)
-
-    pos = 'Latvija, Rīga, '
-    try:
-        df_full_x = df_full.copy()
-        df_full_x['location'] = df_full_x.apply(lambda x: geo_locator.geocode(str(pos + x['street'])), axis=1)
-        df_full_x['lat'] = df_full_x['location'].apply(lambda x: (get_latitude(x)))
-        df_full_x['long'] = df_full_x['location'].apply(lambda x: (get_longitude(x)))
-        del df_full_x['location']
-    except Exception as e:
-        print(e, c('\nCheck either connection is available or under proxy', 'red'))
-        exit(1)
-        pass
-    return df_full_x
-
-
 def drop_col(data_frame, columns):
     for col in columns:
         del data_frame[col]
     return data_frame
-
-
-def get_latitude(x: Location):
-    if hasattr(x, 'latitude') and (x.latitude is not None):
-        return x.latitude
-
-
-def get_longitude(x):
-    if hasattr(x, 'longitude') and (x.longitude is not None):
-        return x.longitude
 
 
 def how_many_pages_2_download(prompt):
@@ -293,7 +261,11 @@ def get_first_file(address):
 
 def get_page(addr, use_proxy=False):
     if use_proxy:
-        page = req.get(addr, proxies=get_proxies())
+        try:
+            page = req.get(addr, proxies=get_proxies())
+        except Exception as e:
+            print(e)
+            exit(1)
     else:
         page = req.get(addr)
     return page
@@ -326,15 +298,23 @@ def load_page(address, page_number, file_name, proxy=False):
                 extracted_link = "https://ss.lv" + link.attrs["href"]
                 current_info.append(extracted_link)
 
-                # date
                 internal_page = get_page(extracted_link, proxy)
                 if internal_page.status_code == 200:
                     internal_page_content = bs4.BeautifulSoup(internal_page.content, "html.parser")
+
+                    # date
                     elements = internal_page_content.find_all("td", class_="msg_footer")
                     try:
                         date_raw = elements[2].string
                     except IndexError as ie:
                         date_raw = "Datums: 01.01.1970 00:00"
+
+                    # location
+                    coordinates_element = internal_page_content.find("a", class_="ads_opt_link_map")
+                    try:
+                        coord_arr = coordinates_element.attrs['onclick'].split("=1&c=")[1].split(",")
+                    except AttributeError as ae:
+                        coord_arr = [0.0, 0.0]
 
             short_text = table_row.find("a", class_="am")
             if short_text is not None: current_info.append(short_text.string)
@@ -353,14 +333,18 @@ def load_page(address, page_number, file_name, proxy=False):
                     v3 = item.text
                     if v3 is not None:
                         current_info.append(v3)
+
+            # append data
             current_info.append(date_raw)
+            current_info.append(coord_arr[0])
+            current_info.append(coord_arr[1])
             info.append(current_info)
     else:
         print(c("Error", "red"))
 
     # print array
     # show(info, True)
-    df = create_dataframe(info, ['link', 'description', 'street', 'rooms', 'm2', 'floor', 'house_type', 'price', 'date'])
+    df = create_dataframe(info, ['link', 'description', 'street', 'rooms', 'm2', 'floor', 'house_type', 'price', 'date', 'lat', 'long'])
 
     # print(df)
     print(c(f"\rConnection success:", "yellow"), c(f"page: {page_number} loaded ...", "green"), end='')

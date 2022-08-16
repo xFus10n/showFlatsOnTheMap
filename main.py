@@ -14,7 +14,6 @@ def main():
         # second stage
         clean.main()
         # third stage
-        draw.use_proxy = use_proxy
         draw.main()
     else:
         use_proxy = f.needs_proxy()
