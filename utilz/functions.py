@@ -10,6 +10,7 @@ import os
 from termcolor import colored as c
 import fpdf
 import plotly.express as px
+import time
 
 
 def plot_barchart(data_frame, x_axis, y_axis, path_out, f_name, p_name, pdf, labels, show_fig=False):
@@ -264,15 +265,18 @@ def get_first_file(address):
 
 
 def get_page(addr, use_proxy=False):
-    if use_proxy:
+    max_retries = 3
+    while max_retries != 0:
         try:
-            page = req.get(addr, proxies=get_proxies())
+            if use_proxy:
+                page = req.get(addr, proxies=get_proxies())
+            else:
+                page = req.get(addr)
+            return page
         except Exception as e:
-            print(e)
-            exit(1)
-    else:
-        page = req.get(addr)
-    return page
+            max_retries = max_retries - 1
+            print(c(f"Failed to connect, attempts left: {max_retries}", "red"))
+            time.sleep(5)
 
 
 def load_page(address, page_number, proxy=False):
@@ -315,30 +319,21 @@ def load_page(address, page_number, proxy=False):
                     region = internal_page_content.find("td", class_="ads_opt", id="tdo_856")
                     current_info.append(region.text)
 
-                    # street todo: AttributeError: 'NoneType' object has no attribute 'text'
+                    # street
                     street = internal_page_content.find("td", class_="ads_opt",  id="tdo_11")
-                    if street is not None:
-                        current_info.append(street.text.replace(" [Karte]", ""))
-                    else:
-                        current_info.append("")
+                    current_info.append(street.text.replace(" [Karte]", "") if street is not None else '')
 
                     # room
                     room = internal_page_content.find("td", class_="ads_opt", id="tdo_1")
-                    current_info.append(room.text)
+                    current_info.append(room.text if room is not None else '')
 
                     # m2
                     m2 = internal_page_content.find("td", class_="ads_opt",  id="tdo_3")
-                    if m2 is not None:
-                        current_info.append(m2.text.replace(" m²", ""))
-                    else:
-                        current_info.append("")
+                    current_info.append(m2.text.replace(" m²", "") if m2 is not None else '')
 
                     # floor
                     floor = internal_page_content.find("td", class_="ads_opt",  id="tdo_4")
-                    if floor is not None:
-                        current_info.append(floor.text.replace("/lifts", ""))
-                    else:
-                        current_info.append("")
+                    current_info.append(floor.text.replace("/lifts", "") if floor is not None else '')
 
                     # house type
                     house = internal_page_content.find("td", class_="ads_opt", id="tdo_6")
@@ -371,7 +366,7 @@ def load_page(address, page_number, proxy=False):
         print(c("Error", "red"))
 
     # print array
-    show(info, True)
+    # show(info, True)
     df = create_dataframe(info, ['link', 'description', 'region', 'street', 'rooms', 'm2', 'floor', 'house_type', 'price', 'date', 'lat', 'long'])
 
     # print(df)
