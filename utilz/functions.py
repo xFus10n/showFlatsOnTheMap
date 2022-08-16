@@ -317,7 +317,10 @@ def load_page(address, page_number, proxy=False):
 
                     # street todo: AttributeError: 'NoneType' object has no attribute 'text'
                     street = internal_page_content.find("td", class_="ads_opt",  id="tdo_11")
-                    current_info.append(street.text.replace(" [Karte]", ""))
+                    if street is not None:
+                        current_info.append(street.text.replace(" [Karte]", ""))
+                    else:
+                        current_info.append("")
 
                     # room
                     room = internal_page_content.find("td", class_="ads_opt", id="tdo_1")
@@ -325,19 +328,25 @@ def load_page(address, page_number, proxy=False):
 
                     # m2
                     m2 = internal_page_content.find("td", class_="ads_opt",  id="tdo_3")
-                    current_info.append(m2.text.replace(" m²", ""))
+                    if m2 is not None:
+                        current_info.append(m2.text.replace(" m²", ""))
+                    else:
+                        current_info.append("")
 
                     # floor
                     floor = internal_page_content.find("td", class_="ads_opt",  id="tdo_4")
-                    current_info.append(floor.text.replace("/lifts", ""))
+                    if floor is not None:
+                        current_info.append(floor.text.replace("/lifts", ""))
+                    else:
+                        current_info.append("")
 
                     # house type
                     house = internal_page_content.find("td", class_="ads_opt", id="tdo_6")
-                    current_info.append(house.text)
+                    current_info.append(house.text if house is not None else '')
 
                     # price
                     price = internal_page_content.find("td", class_="ads_price", id="tdo_8")
-                    current_info.append(price.text)
+                    current_info.append(price.text if price is not None else '')
 
                     # date
                     street = internal_page_content.find_all("td", class_="msg_footer")
@@ -358,13 +367,11 @@ def load_page(address, page_number, proxy=False):
 
             # append data
             info.append(current_info)
-            print(info)
-            exit(0)
     else:
         print(c("Error", "red"))
 
     # print array
-    # show(info, True)
+    show(info, True)
     df = create_dataframe(info, ['link', 'description', 'region', 'street', 'rooms', 'm2', 'floor', 'house_type', 'price', 'date', 'lat', 'long'])
 
     # print(df)
