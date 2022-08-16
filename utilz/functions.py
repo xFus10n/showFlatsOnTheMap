@@ -391,16 +391,6 @@ def check_if_value_is_subset_of_string(value: string):
     return out
 
 
-def split_street(df):
-    df[['region', 'street']] = df.street.str.split("::", expand=True)
-    return df
-
-
-def exception_streets(df):
-    df['street'] = df['street'].str.replace('Viestura pr.', 'Viestura')
-    return df
-
-
 def refine_date(df):
     df['date'] = df['date'].str.replace('Datums: ', '')
     df['date'] = pandas.to_datetime(df['date'], format='%d.%m.%Y %H:%M')
@@ -420,6 +410,11 @@ def set_date_color(df):
 
 def split_floor(df):
     df[['floor', 'top_floor']] = df.floor.str.split("/", expand=True)
+    return df
+
+
+def split_price(df):
+    df[['price', 'price_m2']] = df.price.str.split("(", expand=True)
     return df
 
 
