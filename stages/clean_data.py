@@ -49,18 +49,18 @@ def main():
 
     # price fix
     df_full = f.split_price(df_full)
+    df_full['price'] = df_full['price'].fillna('nan')
     df_full['price_2'] = df_full.price.str.replace("€", "")  # fixme: na=False
     df_full['price_2'] = df_full.price_2.str.replace("/mēn.", "")
     df_full['price_2'] = df_full.price_2.str.replace("/dienā", "")
     df_full['price_2'] = df_full.price_2.str.replace("maiņai", "")
     df_full['price_2'] = df_full.price_2.str.replace(",", "")
+    df_full['price_2'] = df_full.price_2.str.replace(" ", "")
     df_full = f.convert_2_num(df_full, ['rooms', 'floor', 'top_floor', 'm2', 'price_2', 'lat', 'long'])
 
     # price categorisation
+    df_full.loc[df_full['price'].str.contains('nan'), 'com_type'] = 'other'
     df_full.loc[df_full['price'].str.contains("€"), 'com_type'] = 'sell'
-    print(df_full[:1000])
-    exit(0)
-
     df_full.loc[df_full['price'].str.contains("€/mēn"), 'com_type'] = 'rent'
     df_full.loc[df_full['price'].str.contains("€/dienā"), 'com_type'] = 'rent_by_day'
     df_full.loc[df_full['price'].str.contains("vēlosīret"), 'com_type'] = 'want_2_rent'
