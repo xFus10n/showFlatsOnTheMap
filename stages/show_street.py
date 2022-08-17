@@ -44,10 +44,12 @@ def main():
     df_street.index.names = ['index']
     print(df_street)
 
-    try:
-        position = int(input(c(f"Choose street ", "green") + c("(empty = all)", "blue") + c(" : ", "green")))
-    except ValueError as ve:
+    position = input(c(f"Choose street ", "green") + c("(empty = all)", "blue") + c(" : ", "green"))
+    if position.isdigit():
+        position = int(position)
+    else:
         position = None
+
     # show results
     if position is None:
         df = df_reg

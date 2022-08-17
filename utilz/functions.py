@@ -300,15 +300,12 @@ def load_page(address, page_number, proxy=False):
             current_info = []
             table_row = page_content.find(id=current_id)
 
-            # find elements
-            link = table_row.find("a", class_="am")
-
             # short text
-            short_text = table_row.find("a", class_="am")
-            if short_text is not None: current_info.append(short_text.string)
+            row_object = table_row.find("a", class_="am")
+            if row_object is not None: current_info.append(row_object.string) # short text
 
-            if link is not None:
-                extracted_link = "https://ss.lv" + link.attrs["href"]
+            if row_object is not None:
+                extracted_link = "https://ss.lv" + row_object.attrs["href"]
                 current_info.append(extracted_link)
 
                 internal_page = get_page(extracted_link, proxy)
@@ -367,7 +364,7 @@ def load_page(address, page_number, proxy=False):
 
     # print array
     # show(info, True)
-    df = create_dataframe(info, ['link', 'description', 'region', 'street', 'rooms', 'm2', 'floor', 'house_type', 'price', 'date', 'lat', 'long'])
+    df = create_dataframe(info, ['description', 'link', 'region', 'street', 'rooms', 'm2', 'floor', 'house_type', 'price', 'date', 'lat', 'long'])
 
     # print(df)
     print(c(f"\rConnection success:", "yellow"), c(f"page: {page_number} loaded ...", "green"), end='')
