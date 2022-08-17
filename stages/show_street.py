@@ -45,10 +45,7 @@ def main():
     print(df_street)
 
     position = input(c(f"Choose street ", "green") + c("(empty = all)", "blue") + c(" : ", "green"))
-    if position.isdigit():
-        position = int(position)
-    else:
-        position = None
+    position = int(position) if position.isdigit() else None
 
     # show results
     if position is None:
