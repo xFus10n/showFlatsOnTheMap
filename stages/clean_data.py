@@ -44,6 +44,7 @@ def main():
     df_full = f.get_csv_files(address_in)
     df_full.drop_duplicates(inplace=True, ignore_index=True)
     df_full = f.refine_date(df_full)
+    df_full = f.check_city(df_full)
     df_full = f.set_date_color(df_full)
     df_full = f.split_floor(df_full)
 

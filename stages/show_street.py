@@ -32,8 +32,16 @@ def main():
     pdf = f.create_pdf(address_font)
     columnz = ['link', 'street', 'rooms', 'floor', 'm2', 'house_type', 'price_2', 'com_type', 'date', 'color', 'lat', 'long']
     df_full = pd.read_csv(file, header=0, sep=';')
-    df_out, regions = agg.get_streets_short(df_full)
+
+    # ask for city
+    df_cities = df_full['city'].drop_duplicates().reset_index(drop=True)
+    print(df_cities)
+    position = input(c(f"Choose city: ", "green"))
+    key_city = df_cities.iloc[[position]].tolist()[0]
+    df_full = df_full.query(f'city == "{key_city}"')
+
     # ask for region input
+    df_out, regions = agg.get_streets_short(df_full)
     print(regions)
     position = input(c(f"Choose region: ", "green"))
     key_reg = regions.iloc[[position]].tolist()[0]

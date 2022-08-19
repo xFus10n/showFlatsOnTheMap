@@ -8,7 +8,8 @@ def main():
     global use_proxy
 
     # fixed address
-    address_0 = "https://www.ss.lv/lv/real-estate/flats/riga/all/"
+    # address_0 = "https://www.ss.lv/lv/real-estate/flats/riga/all/"
+    address_0 = "https://www.ss.lv/lv/real-estate/flats/riga-region/all/"
     # starting page
     page = 1
     # user input

@@ -312,9 +312,13 @@ def load_page(address, page_number, proxy=False):
                 if internal_page.status_code == 200:
                     internal_page_content = bs4.BeautifulSoup(internal_page.content, "html.parser")
 
+                    # city
+                    city = internal_page_content.find("td", class_="ads_opt", id="tdo_20")
+                    current_info.append(getattr(city, 'text', ''))
+
                     # region
                     region = internal_page_content.find("td", class_="ads_opt", id="tdo_856")
-                    current_info.append(region.text)
+                    current_info.append(getattr(region, 'text', ''))
 
                     # street
                     street = internal_page_content.find("td", class_="ads_opt",  id="tdo_11")
@@ -322,7 +326,7 @@ def load_page(address, page_number, proxy=False):
 
                     # room
                     room = internal_page_content.find("td", class_="ads_opt", id="tdo_1")
-                    current_info.append(room.text if room is not None else '')
+                    current_info.append(getattr(room, 'text', ''))
 
                     # m2
                     m2 = internal_page_content.find("td", class_="ads_opt",  id="tdo_3")
@@ -334,16 +338,16 @@ def load_page(address, page_number, proxy=False):
 
                     # house type
                     house = internal_page_content.find("td", class_="ads_opt", id="tdo_6")
-                    current_info.append(house.text if house is not None else '')
+                    current_info.append(getattr(house, 'text', ''))
 
                     # price
                     price = internal_page_content.find("td", class_="ads_price", id="tdo_8")
-                    current_info.append(price.text if price is not None else '')
+                    current_info.append(getattr(price, 'text', ''))
 
                     # date
-                    street = internal_page_content.find_all("td", class_="msg_footer")
+                    footer = internal_page_content.find_all("td", class_="msg_footer")
                     try:
-                        date_raw = street[2].string
+                        date_raw = footer[2].string
                     except IndexError as ie:
                         date_raw = "Datums: 01.01.1970 00:00"
                     current_info.append(date_raw)
@@ -364,33 +368,22 @@ def load_page(address, page_number, proxy=False):
 
     # print array
     # show(info, True)
-    df = create_dataframe(info, ['description', 'link', 'region', 'street', 'rooms', 'm2', 'floor', 'house_type', 'price', 'date', 'lat', 'long'])
+    # exit(0)
+    df = create_dataframe(info, ['description', 'link', 'city', 'region', 'street', 'rooms', 'm2', 'floor', 'house_type', 'price', 'date', 'lat', 'long'])
 
     # print(df)
     print(c(f"\rConnection success:", "yellow"), c(f"page: {page_number} loaded ...", "green"), end='')
     return 1, df
 
 
-def check_if_value_is_subset_of_string(value: string):
-    out = ""
-    regions = ["centrs", "Āgenskalns", "Aplokciems", "Beberbeķi", "Berģi", "Bieriņi", "Bolderāja", "Brekši",
-               "Bukulti", "Čiekurkalns", "Dārzciems", "Daugavgrīva", "Dreiliņi", "Dzegužkalns", "Dārziņi",
-               "Grīziņkalns", "Iļģuciems", "Imanta", "Jaunciems", "Jaunmīlgrāvis", "Jugla", "Katlakalns",
-               "Ķengarags", "Ķīpsala", "Kleisti", "Klīversala", "Krasta r-ns", "Kundziņsala", "Mangaļi",
-               "Mangaļsala", "Maskavas priekšpilsēta", "Mežaparks", "Mežciems", "Pļavnieki", "Purvciems",
-               "Šampēteris-Pleskodāle", "Sarkandaugava", "Šķirotava", "Teika", "Torņakalns", "Vecāķi",
-               "Vecdaugava", "Vecmīlgrāvis", "Vecrīga", "Voleri", "Zasulauks", "Ziepniekkalns", "Zolitūde",
-               "VEF", "Cits"]
-    for reg in regions:
-        if reg in value:
-            # print(f"in : {value}, out : {reg}::{value[len(reg):]}")
-            out = f"{reg}::{value[len(reg):]}"
-    return out
-
-
 def refine_date(df):
     df['date'] = df['date'].str.replace('Datums: ', '')
     df['date'] = pandas.to_datetime(df['date'], format='%d.%m.%Y %H:%M')
+    return df
+
+
+def check_city(df):
+    df['city'] = df['city'].fillna('unknown')
     return df
 
 
