@@ -1,20 +1,38 @@
 import pathlib
 from datetime import datetime
 from utilz import functions as f
+from utilz import sources as src
 from termcolor import colored as c
+
+global use_proxy
 
 
 def main():
     global use_proxy
 
-    # fixed address
-    # address_0 = "https://www.ss.lv/lv/real-estate/flats/riga/all/"
-    address_0 = "https://www.ss.lv/lv/real-estate/flats/riga-region/all/"
+    links = src.get_links_for_flats()
+    enumerated_keys = src.enumerate_keys(links)
+    src.print_dictionary(enumerated_keys)
+    city_key = int(input(c('Choose city / region : ', 'green')))
+    if city_key != 0:
+        address = links.get(enumerated_keys.get(city_key))
+        run(address, use_proxy)
+    else:
+        for region, link in links.items():
+            if link != '':
+                run(link, use_proxy, all_regions=True, postfix=region)
+
+
+def run(address_0, use_proxy, all_regions=False, postfix=''):
+
     # starting page
     page = 1
     # user input
-    file_name = str(input("enter file name without extension (leave empty for datetime): "))
-    count = f.how_many_pages_2_download("enter the number of pages to load: ")
+    if not all_regions:
+        file_name = str(input("enter file name without extension (leave empty for datetime): "))
+        count = f.how_many_pages_2_download("enter the number of pages to load: ")
+    else:
+        count = 1 #todo: extract
 
     # set path correctly
     if __name__ == '__main__':
@@ -25,7 +43,11 @@ def main():
 
     # use datetime as name if empty
     date_now = datetime.now().strftime("%Y%m%d%H%M%S")
-    if file_name == '': file_name = date_now
+    if all_regions:
+        file_name = date_now + f"_{postfix}"
+    else:
+        if file_name == '': file_name = date_now
+
     if location_out.exists():
         print(c("staging folder founded :", "yellow"), c(str(f.bool_2_human(location_out.exists())), "green"))
     else:
