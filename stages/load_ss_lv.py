@@ -10,6 +10,7 @@ global use_proxy
 def main():
     global use_proxy
 
+    count = f.how_many_pages_2_download("enter the number of pages to load: ")
     links = src.get_links_for_flats()
     enumerated_keys = src.enumerate_keys(links)
     src.print_dictionary(enumerated_keys)
@@ -20,19 +21,16 @@ def main():
     else:
         for region, link in links.items():
             if link != '':
-                run(link, use_proxy, all_regions=True, postfix=region)
+                run(link, count, use_proxy, all_regions=True, postfix=region)
 
 
-def run(address_0, use_proxy, all_regions=False, postfix=''):
+def run(address_0, page_count, use_proxy, all_regions=False, postfix=''):
 
     # starting page
     page = 1
     # user input
     if not all_regions:
         file_name = str(input("enter file name without extension (leave empty for datetime): "))
-        count = f.how_many_pages_2_download("enter the number of pages to load: ")
-    else:
-        count = 1 #todo: extract
 
     # set path correctly
     if __name__ == '__main__':
@@ -62,7 +60,7 @@ def run(address_0, use_proxy, all_regions=False, postfix=''):
         status, data = f.load_page(address, page, proxy=use_proxy)
         if status != 0:
             df_list.append(data)
-            if page < count:
+            if page < page_count:
                 page += 1
             else:  # reached the end of requested pages
                 break
