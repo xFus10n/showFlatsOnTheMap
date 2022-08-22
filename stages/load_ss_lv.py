@@ -17,7 +17,7 @@ def main():
     city_key = int(input(c('Choose city / region : ', 'green')))
     if city_key != 0:
         address = links.get(enumerated_keys.get(city_key))
-        run(address, use_proxy)
+        run(address, count, use_proxy)
     else:
         for region, link in links.items():
             if link != '':
