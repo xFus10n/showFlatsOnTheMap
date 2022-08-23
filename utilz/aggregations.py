@@ -33,7 +33,7 @@ def get_streets_short(df_full):
     df_filter = df_full[df_full['street'].notna()].copy()
 
     # split street
-    df_filter['street_list'] = df_filter['street'].str.split(' ')
+    df_filter['street_list'] = df_filter['street'].str.lower().str.replace(r'\d+.', '', regex=True).str.split(' ')
 
     # check whether first part contains more than 3 symbols
     df_filter['first_part_valid'] = np.where(df_filter['street_list'].str[0].str.len() > 3, True, False)
