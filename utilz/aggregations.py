@@ -78,3 +78,9 @@ def commercials_for_house_type(df_full):
         .sort_values('counts', ascending=False)
     df_com.insert(0, 'house_type_col', df_com.index)
     return df_com
+
+
+def mean_selling_price(df):
+    df_sell = df.query("com_type=='sell'")
+    df_sell = df_sell.groupby(['city', 'region', 'house_type'])['price_m2'].agg(mean='mean', factor='count') #.sort_values(by='mean', ascending=False)
+    return df.join(df_sell, ['city', 'region', 'house_type'])

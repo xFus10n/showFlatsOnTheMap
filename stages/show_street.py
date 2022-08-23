@@ -30,7 +30,7 @@ def main():
         exit(0)
     f.clear_dir(address_out)
     pdf = f.create_pdf(address_font)
-    columnz = ['link', 'street', 'rooms', 'floor', 'm2', 'house_type', 'price_2', 'com_type', 'date', 'color', 'lat', 'long']
+    columnz = ['link', 'street', 'rooms', 'm2', 'house_type', 'price_2', 'price_m2', 'mean', 'factor', 'com_type', 'date', 'color', 'lat', 'long']
     df_full = pd.read_csv(file, header=0, sep=';')
 
     # ask for city

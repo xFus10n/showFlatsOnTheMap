@@ -5,6 +5,7 @@ import warnings
 from utilz import functions as f
 from termcolor import colored as c
 from datetime import datetime
+from utilz.aggregations import mean_selling_price as mp
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
@@ -50,14 +51,18 @@ def main():
 
     # price fix
     df_full = f.split_price(df_full)
+    df_full['price_m2'] = df_full.price_m2.str.replace("€/m²\\)", "")
+    df_full['price_m2'] = df_full.price_m2.str.replace(" ", "")
+    df_full['price_m2'] = df_full.price_m2.fillna('nan')
+
     df_full['price'] = df_full['price'].fillna('nan')
-    df_full['price_2'] = df_full.price.str.replace("€", "")  # fixme: na=False
+    df_full['price_2'] = df_full.price.str.replace("€", "")
     df_full['price_2'] = df_full.price_2.str.replace("/mēn.", "")
     df_full['price_2'] = df_full.price_2.str.replace("/dienā", "")
     df_full['price_2'] = df_full.price_2.str.replace("maiņai", "")
     df_full['price_2'] = df_full.price_2.str.replace(",", "")
     df_full['price_2'] = df_full.price_2.str.replace(" ", "")
-    df_full = f.convert_2_num(df_full, ['rooms', 'floor', 'top_floor', 'm2', 'price_2', 'lat', 'long'])
+    df_full = f.convert_2_num(df_full, ['rooms', 'floor', 'top_floor', 'm2', 'price_2', 'price_m2', 'lat', 'long'])
 
     # price categorisation
     df_full.loc[df_full['price'].str.contains('nan'), 'com_type'] = 'other'
@@ -68,9 +73,15 @@ def main():
     df_full.loc[df_full['price'].str.contains("pērku"), 'com_type'] = 'buy'
     df_full.loc[df_full['price'].str.contains('maiņai'), 'com_type'] = 'change'
 
+    # mean price for region /house type & round up
+    df_full = mp(df_full)
+    df_full[['mean', 'factor', 'rooms', 'm2']] = df_full[['mean', 'factor', 'rooms', 'm2']].fillna(0)
+    df_full[['mean', 'factor', 'rooms', 'm2']] = df_full[['mean', 'factor', 'rooms', 'm2']].round(0).astype(int)
+
     print(c("unique rows after upload: ", "green"), c(str(len(df_full)), "yellow"))
     f.save_as_csv(df_full, address_out / f'{date_now}.csv', verbose=True)
     # print(df_full[:1000])
+    # exit(0)
 
 
 if __name__ == "__main__":

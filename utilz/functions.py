@@ -70,7 +70,7 @@ def create_pdf():
 def create_pdf(address_font):
     pdf = fpdf.FPDF(orientation='P', unit='mm', format='A4')
     pdf.add_font('Arial', '', address_font, uni=True)
-    pdf.set_font('Arial', '', 10)
+    pdf.set_font('Arial', '', 9)
     return pdf
 
 
@@ -138,13 +138,14 @@ def create_map_html(data_frame, path_2_analytical_dir, name):
                  + '<b>Building Type:</b> ' + df['house_type'].map(str) + ',<br>'\
                  + '<b>Area:</b> ' + df['m2'].map(str) + '(m2),<br>'\
                  + '<b>Price:</b> ' + df['price_2'].map(str) + '(EUR),<br>'\
+                 + '<b>Price/m2:</b> ' + df['price_m2'].map(str) + '(EUR),<br>'\
                  + '<b>Date:</b> ' + df['date'].map(str) + ',<br>'\
                  + '<b>Link:</b> <a href="' + df['link'].map(str) + '" target="_blank">source</a>'
     try:
         mapx = folium.Map(location=[df.lat.mean(), df.long.mean()], zoom_start=14, control_scale=True)
         for index, location_info in df.iterrows():
             iframe = folium.IFrame(location_info['info'])
-            popup = folium.Popup(iframe, min_width=250, max_width=350)
+            popup = folium.Popup(iframe, min_width=300, max_width=350)
             folium.Marker([location_info["lat"], location_info["long"]],
                           popup=popup, icon=folium.Icon(color=location_info['color'])).add_to(mapx)
         full_html_name = f"{path_2_analytical_dir}/{name}.html"
