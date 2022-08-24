@@ -75,7 +75,9 @@ def create_pdf(address_font):
 
 
 def log_data_pdf(pdf, data_frame):
-    short_cols = ('rooms', 'floor', 'm2')
+    short_col_factor = 1.8  # div
+    long_col_factor = 2.1   # mult
+    short_cols = ('rooms', 'floor', 'm2', 'weight', 'flux')
     long_cols = ('street', 'date')
     omit_columns = ('link', 'color')
     real_width = pdf.w - 2 * pdf.l_margin
@@ -87,9 +89,9 @@ def log_data_pdf(pdf, data_frame):
         if col in omit_columns:
             pass
         elif col in short_cols:
-            pdf.cell(column_width / 2, row_hight, str(col), border=1, align='C')
+            pdf.cell(column_width / short_col_factor, row_hight, str(col), border=1, align='C')
         elif col in long_cols:
-            pdf.cell(column_width * 1.8, row_hight, str(col), border=1, align='C')
+            pdf.cell(column_width * long_col_factor, row_hight, str(col), border=1, align='C')
         else:
             pdf.cell(column_width, row_hight, str(col), border=1, align='C')
     pdf.ln()
@@ -100,9 +102,9 @@ def log_data_pdf(pdf, data_frame):
             if col in omit_columns:
                 pass
             elif col in short_cols:
-                pdf.cell(column_width / 2, row_hight, str(data_frame[col].iloc[i]), border=1)
+                pdf.cell(column_width / short_col_factor, row_hight, str(data_frame[col].iloc[i]), border=1)
             elif col in long_cols:
-                pdf.cell(column_width * 1.8, row_hight, str(data_frame[col].iloc[i]), border=1)
+                pdf.cell(column_width * long_col_factor, row_hight, str(data_frame[col].iloc[i]), border=1)
             else:
                 pdf.cell(column_width, row_hight, str(data_frame[col].iloc[i]), border=1)
         pdf.ln()
@@ -138,7 +140,7 @@ def create_map_html(data_frame, path_2_analytical_dir, name):
                  + '<b>Building Type:</b> ' + df['house_type'].map(str) + ',<br>'\
                  + '<b>Area:</b> ' + df['m2'].map(str) + '(m2),<br>'\
                  + '<b>Price:</b> ' + df['price_2'].map(str) + '(EUR),<br>'\
-                 + '<b>Price/m2:</b> ' + df['price_m2'].map(str) + '(EUR),<br>'\
+                 + '<b>Flux:</b> ' + df['flux'].map(str) + ',<br>'\
                  + '<b>Date:</b> ' + df['date'].map(str) + ',<br>'\
                  + '<b>Link:</b> <a href="' + df['link'].map(str) + '" target="_blank">source</a>'
     try:

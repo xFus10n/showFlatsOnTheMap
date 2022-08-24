@@ -81,6 +81,8 @@ def commercials_for_house_type(df_full):
 
 
 def mean_selling_price(df):
-    df_sell = df.query("com_type=='sell'")
-    df_sell = df_sell.groupby(['city', 'region', 'house_type'])['price_m2'].agg(mean='mean', factor='count') #.sort_values(by='mean', ascending=False)
-    return df.join(df_sell, ['city', 'region', 'house_type'])
+    # df_sell = df.query("com_type=='sell'")
+    df_sell = df.groupby(['com_type', 'city', 'region', 'house_type'])['price_m2'].agg(mean='mean', weight='count')
+    df = df.join(df_sell, ['com_type', 'city', 'region', 'house_type'])
+    df['flux'] = (df['price_m2'] / df['mean']) - 1
+    return df
