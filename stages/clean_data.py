@@ -75,8 +75,8 @@ def main():
 
     # mean price for region /house type & round up
     df_full = mp(df_full)
-    df_full[['mean', 'weight', 'rooms', 'm2', 'flux']] = df_full[['mean', 'weight', 'rooms', 'm2', 'flux']].fillna(0)
-    df_full[['mean', 'weight', 'rooms', 'm2']] = df_full[['mean', 'weight', 'rooms', 'm2']].round(0).astype(int)
+    df_full[['mean', 'weight', 'rooms', 'm2', 'flux', 'price_2', 'price_m2']] = df_full[['mean', 'weight', 'rooms', 'm2', 'flux', 'price_2', 'price_m2']].fillna(0)
+    df_full[['mean', 'weight', 'rooms', 'm2', 'price_2', 'price_m2']] = df_full[['mean', 'weight', 'rooms', 'm2', 'price_2', 'price_m2']].round(0).astype(int)
     df_full['flux'] = df_full['flux'].round(2)
 
     print(c("unique rows after upload: ", "green"), c(str(len(df_full)), "yellow"))

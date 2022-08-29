@@ -147,7 +147,7 @@ def create_map_html(data_frame, path_2_analytical_dir, name):
         mapx = folium.Map(location=[df.lat.mean(), df.long.mean()], zoom_start=14, control_scale=True)
         for index, location_info in df.iterrows():
             iframe = folium.IFrame(location_info['info'])
-            popup = folium.Popup(iframe, min_width=300, max_width=350)
+            popup = folium.Popup(iframe, min_width=300, max_width=300)
             folium.Marker([location_info["lat"], location_info["long"]],
                           popup=popup, icon=folium.Icon(color=location_info['color'])).add_to(mapx)
         full_html_name = f"{path_2_analytical_dir}/{name}.html"
