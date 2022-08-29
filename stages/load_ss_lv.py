@@ -4,8 +4,6 @@ from utilz import functions as f
 from utilz import sources as src
 from termcolor import colored as c
 
-global use_proxy
-
 
 def main():
     global use_proxy

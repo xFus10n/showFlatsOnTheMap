@@ -12,6 +12,9 @@ import fpdf
 import plotly.express as px
 import time
 
+from utilz.PageAttributes import get_city, get_region, get_street, get_rooms, get_area_m2, get_floor, get_house_type, \
+    get_price, get_date, get_location
+
 
 def plot_barchart(data_frame, x_axis, y_axis, path_out, f_name, p_name, pdf, labels, show_fig=False):
     path = str(path_out / f'{f_name}.png')
@@ -255,7 +258,7 @@ def clear_dir(location):
 def get_csv_files(address_in):
     df_list = list()
     for path in list(address_in.glob("**/*.csv")):
-        print(path)
+        # print(path)
         df_list.append(pandas.read_csv(path, header=0, sep=';'))
     df_full = pandas.concat(df_list, ignore_index=True, sort=False)
     return df_full
@@ -317,54 +320,16 @@ def load_page(address, page_number, proxy=False):
                 if internal_page.status_code == 200:
                     internal_page_content = bs4.BeautifulSoup(internal_page.content, "html.parser")
 
-                    # city
-                    city = internal_page_content.find("td", class_="ads_opt", id="tdo_20")
-                    current_info.append(getattr(city, 'text', ''))
-
-                    # region
-                    region = internal_page_content.find("td", class_="ads_opt", id="tdo_856")
-                    current_info.append(getattr(region, 'text', ''))
-
-                    # street
-                    street = internal_page_content.find("td", class_="ads_opt",  id="tdo_11")
-                    current_info.append(street.text.replace(" [Karte]", "") if street is not None else '')
-
-                    # room
-                    room = internal_page_content.find("td", class_="ads_opt", id="tdo_1")
-                    current_info.append(getattr(room, 'text', ''))
-
-                    # m2
-                    m2 = internal_page_content.find("td", class_="ads_opt",  id="tdo_3")
-                    current_info.append(m2.text.replace(" m²", "") if m2 is not None else '')
-
-                    # floor
-                    floor = internal_page_content.find("td", class_="ads_opt",  id="tdo_4")
-                    current_info.append(floor.text.replace("/lifts", "") if floor is not None else '')
-
-                    # house type
-                    house = internal_page_content.find("td", class_="ads_opt", id="tdo_6")
-                    current_info.append(getattr(house, 'text', ''))
-
-                    # price
-                    price = internal_page_content.find("td", class_="ads_price", id="tdo_8")
-                    current_info.append(getattr(price, 'text', ''))
-
-                    # date
-                    footer = internal_page_content.find_all("td", class_="msg_footer")
-                    try:
-                        date_raw = footer[2].string
-                    except IndexError as ie:
-                        date_raw = "Datums: 01.01.1970 00:00"
-                    current_info.append(date_raw)
-
-                    # location
-                    coordinates_element = internal_page_content.find("a", class_="ads_opt_link_map")
-                    try:
-                        coord_arr = coordinates_element.attrs['onclick'].split("=1&c=")[1].split(",")
-                    except AttributeError as ae:
-                        coord_arr = [0.0, 0.0]
-                    current_info.append(coord_arr[0])
-                    current_info.append(coord_arr[1])
+                    get_city(current_info, internal_page_content)
+                    get_region(current_info, internal_page_content)
+                    get_street(current_info, internal_page_content)
+                    get_rooms(current_info, internal_page_content)
+                    get_area_m2(current_info, internal_page_content)
+                    get_floor(current_info, internal_page_content)
+                    get_house_type(current_info, internal_page_content)
+                    get_price(current_info, internal_page_content)
+                    get_date(current_info, internal_page_content)
+                    get_location(current_info, internal_page_content)
 
             # append data
             info.append(current_info)
