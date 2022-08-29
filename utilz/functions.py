@@ -243,6 +243,7 @@ def save_as_csv(data_frame, name_path, verbose=False):
 
 
 def list_of_df_to_csv(df_list, filename):
+    filename.parents[0].mkdir(parents=True, exist_ok=True)
     pandas.concat(df_list).to_csv(filename, index=False, encoding='utf8', sep=';')
 
 
@@ -253,7 +254,8 @@ def clear_dir(location):
 
 def get_csv_files(address_in):
     df_list = list()
-    for path in list(address_in.glob("./*.csv")):
+    for path in list(address_in.glob("**/*.csv")):
+        print(path)
         df_list.append(pandas.read_csv(path, header=0, sep=';'))
     df_full = pandas.concat(df_list, ignore_index=True, sort=False)
     return df_full
