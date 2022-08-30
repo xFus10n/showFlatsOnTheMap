@@ -13,7 +13,7 @@ import plotly.express as px
 import time
 
 from utilz.PageAttributes import get_city, get_region, get_street, get_rooms, get_area_m2, get_floor, get_house_type, \
-    get_price, get_date, get_location
+    get_price, get_date, get_location, elements_dispatcher
 
 
 def plot_barchart(data_frame, x_axis, y_axis, path_out, f_name, p_name, pdf, labels, show_fig=False):
@@ -319,17 +319,8 @@ def load_page(address, page_number, proxy=False):
                 internal_page = get_page(extracted_link, proxy)
                 if internal_page.status_code == 200:
                     internal_page_content = bs4.BeautifulSoup(internal_page.content, "html.parser")
-
-                    get_city(current_info, internal_page_content)
-                    get_region(current_info, internal_page_content)
-                    get_street(current_info, internal_page_content)
-                    get_rooms(current_info, internal_page_content)
-                    get_area_m2(current_info, internal_page_content)
-                    get_floor(current_info, internal_page_content)
-                    get_house_type(current_info, internal_page_content)
-                    get_price(current_info, internal_page_content)
-                    get_date(current_info, internal_page_content)
-                    get_location(current_info, internal_page_content)
+                    for page_element in elements_dispatcher.get("flats"):
+                        page_element(current_info, internal_page_content)
 
             # append data
             info.append(current_info)

@@ -55,3 +55,6 @@ def get_location(current_info, internal_page_content):
         coord_arr = [0.0, 0.0]
     current_info.append(coord_arr[0])
     current_info.append(coord_arr[1])
+
+
+elements_dispatcher = {'flats': [get_city, get_region, get_street, get_rooms, get_area_m2, get_floor, get_house_type, get_price, get_date, get_location]}
