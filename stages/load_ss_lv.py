@@ -9,7 +9,7 @@ def main():
     global use_proxy
     use_proxy = f.needs_proxy() if __name__ == '__main__' else use_proxy
     count = f.how_many_pages_2_download("enter the number of pages to load: ")
-    links = src.get_links_for_flats()
+    links = src.get_links('flats')
     enumerated_keys = src.enumerate_keys(links)
     src.print_dictionary(enumerated_keys)
     city_key = int(input(c('Choose city / region : ', 'green')))

@@ -29,6 +29,13 @@ def get_links_for_houses():
             'Riga-reg': 'https://www.ss.lv/lv/real-estate/homes-summer-residences/riga-region/all/'}
 
 
+linkz = {'flats': get_links_for_flats(), 'houses': get_links_for_houses()}
+
+
+def get_links(key):
+    return linkz.get(key)
+
+
 def enumerate_keys(dictionary):
     sequence = [x for x in range(len(dictionary.keys()))]
     return dict(zip(sequence, dictionary.keys()))
