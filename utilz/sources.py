@@ -22,6 +22,13 @@ def get_links_for_flats():
             'Ogre-reg': 'https://www.ss.lv/lv/real-estate/flats/ogre-and-reg/all/'}
 
 
+def get_links_for_houses():
+    return {'All': '',
+            'Riga': 'https://www.ss.lv/lv/real-estate/homes-summer-residences/riga/all/',
+            'Jurmala': 'https://www.ss.lv/lv/real-estate/homes-summer-residences/jurmala/all/',
+            'Riga-reg': 'https://www.ss.lv/lv/real-estate/homes-summer-residences/riga-region/all/'}
+
+
 def enumerate_keys(dictionary):
     sequence = [x for x in range(len(dictionary.keys()))]
     return dict(zip(sequence, dictionary.keys()))
@@ -29,4 +36,3 @@ def enumerate_keys(dictionary):
 
 def print_dictionary(dictionary):
     [print(key, ' : ', val) for key, val in dictionary.items()]
-
