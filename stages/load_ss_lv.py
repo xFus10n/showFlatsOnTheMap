@@ -13,16 +13,17 @@ def main():
     use_proxy = f.needs_proxy() if __name__ == '__main__' else use_proxy
     page_count = f.how_many_pages_2_download("enter the number of pages to load: ")
 
-    links = src.get_links(options.get(option_key))
+    mode = options.get(option_key)
+    links = src.get_links(mode)
     city_key, city_options = mode_select(links, 'Choose city / region : ')  # user input
 
     if city_key != 0:  # 0 -> all
         address = links.get(city_options.get(city_key))
-        run(address, page_count, use_proxy, filename=city_options.get(city_key))
+        run(mode, address, page_count, use_proxy, filename=city_options.get(city_key))
     else:
         for region, link in links.items():
             if link != '':
-                run(link, page_count, use_proxy, filename=region)
+                run(mode, link, page_count, use_proxy, filename=region)
 
 
 def mode_select(dictionary, msg):
@@ -32,7 +33,7 @@ def mode_select(dictionary, msg):
     return option_key, options
 
 
-def run(address_0, page_count, use_proxy, filename=''):
+def run(mode, address_0, page_count, use_proxy, filename=''):
 
     # starting page
     page = 1
@@ -54,10 +55,10 @@ def run(address_0, page_count, use_proxy, filename=''):
         exit(1)
     # will exit after the last page
     df_list = []
-    output = location_out / f'{date_now}/{filename}.csv'
+    output = location_out / mode / f'{date_now}/{filename}.csv'
     while True:
         address = f"{address_0}page{page}.html"
-        status, data = f.load_page(address, page, proxy=use_proxy)
+        status, data = f.load_page(mode, address, page, proxy=use_proxy)
         if status != 0:
             df_list.append(data)
             if page < page_count:

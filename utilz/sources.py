@@ -1,3 +1,9 @@
+from utilz.PageAttributes import get_city, get_region, get_street, get_rooms, get_area_m2, get_floor, get_house_type, \
+    get_price, get_date, get_location, get_house_rooms, get_outer_area_m2, get_floor_count, get_amenities
+
+flats, houses = ('flats', 'houses')
+
+
 def get_links_for_flats():
     return {'All': '',
             'Riga': 'https://www.ss.lv/lv/real-estate/flats/riga/all/',
@@ -29,9 +35,6 @@ def get_links_for_houses():
             'Riga-reg': 'https://www.ss.lv/lv/real-estate/homes-summer-residences/riga-region/all/'}
 
 
-linkz = {'flats': get_links_for_flats(), 'houses': get_links_for_houses()}
-
-
 def get_links(key):
     return linkz.get(key)
 
@@ -43,3 +46,17 @@ def enumerate_keys(dictionary):
 
 def print_dictionary(dictionary):
     [print(key, ' : ', val) for key, val in dictionary.items()]
+
+
+elements_dispatcher = {
+    flats: [get_city, get_region, get_street, get_rooms, get_area_m2, get_floor, get_house_type, get_price, get_date,
+            get_location],
+    houses: [get_city, get_region, get_street, get_house_rooms, get_outer_area_m2, get_area_m2, get_floor_count,
+             get_amenities, get_price, get_date, get_location]}
+
+linkz = {flats: get_links_for_flats(), houses: get_links_for_houses()}
+columnz = {
+    flats: ['description', 'link', 'city', 'region', 'street', 'rooms', 'm2', 'floor', 'house_type', 'price', 'date',
+            'lat', 'long'],
+    houses: ['description', 'link', 'city', 'region', 'street', 'rooms', 'out_m2', 'm2', 'floor', 'amenity', 'price',
+             'date', 'lat', 'long']}

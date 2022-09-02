@@ -12,8 +12,7 @@ import fpdf
 import plotly.express as px
 import time
 
-from utilz.PageAttributes import get_city, get_region, get_street, get_rooms, get_area_m2, get_floor, get_house_type, \
-    get_price, get_date, get_location, elements_dispatcher
+from utilz.sources import elements_dispatcher, columnz
 
 
 def plot_barchart(data_frame, x_axis, y_axis, path_out, f_name, p_name, pdf, labels, show_fig=False):
@@ -287,7 +286,7 @@ def get_page(addr, use_proxy=False):
             time.sleep(5)
 
 
-def load_page(address, page_number, proxy=False):
+def load_page(mode, address, page_number, proxy=False):
     # load the page
     page = get_page(address, proxy)
 
@@ -319,7 +318,7 @@ def load_page(address, page_number, proxy=False):
                 internal_page = get_page(extracted_link, proxy)
                 if internal_page.status_code == 200:
                     internal_page_content = bs4.BeautifulSoup(internal_page.content, "html.parser")
-                    for page_element in elements_dispatcher.get("flats"):
+                    for page_element in elements_dispatcher.get(mode):
                         page_element(current_info, internal_page_content)
 
             # append data
@@ -330,7 +329,7 @@ def load_page(address, page_number, proxy=False):
     # print array
     # show(info, True)
     # exit(0)
-    df = create_dataframe(info, ['description', 'link', 'city', 'region', 'street', 'rooms', 'm2', 'floor', 'house_type', 'price', 'date', 'lat', 'long'])
+    df = create_dataframe(info, columnz.get(mode))
 
     # print(df)
     print(c(f"\rConnection success:", "yellow"), c(f"page: {page_number} loaded ...", "green"), end='')
