@@ -7,20 +7,29 @@ from termcolor import colored as c
 
 def main():
     global use_proxy
+
+    # user inputs
+    option_key, options = mode_select(src.linkz, 'Choose flats or houses : ')
     use_proxy = f.needs_proxy() if __name__ == '__main__' else use_proxy
-    count = f.how_many_pages_2_download("enter the number of pages to load: ")
-    links = src.get_links('flats')
-    enumerated_keys = src.enumerate_keys(links)
-    src.print_dictionary(enumerated_keys)
-    city_key = int(input(c('Choose city / region : ', 'green')))
-    if city_key != 0:
-        region = enumerated_keys.get(city_key)
-        address = links.get(region)
-        run(address, count, use_proxy, filename=region)
+    page_count = f.how_many_pages_2_download("enter the number of pages to load: ")
+
+    links = src.get_links(options.get(option_key))
+    city_key, city_options = mode_select(links, 'Choose city / region : ')  # user input
+
+    if city_key != 0:  # 0 -> all
+        address = links.get(city_options.get(city_key))
+        run(address, page_count, use_proxy, filename=city_options.get(city_key))
     else:
         for region, link in links.items():
             if link != '':
-                run(link, count, use_proxy, filename=region)
+                run(link, page_count, use_proxy, filename=region)
+
+
+def mode_select(dictionary, msg):
+    options = src.enumerate_keys(dictionary)  # flats or houses
+    src.print_dictionary(options)
+    option_key = int(input(c(msg, 'green')))
+    return option_key, options
 
 
 def run(address_0, page_count, use_proxy, filename=''):
