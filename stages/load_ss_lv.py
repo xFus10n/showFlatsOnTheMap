@@ -4,6 +4,8 @@ from utilz import functions as f
 from utilz import sources as src
 from termcolor import colored as c
 
+from utilz.functions import mode_select
+
 
 def main():
     global use_proxy
@@ -25,12 +27,7 @@ def main():
             if link != '':
                 run(mode, link, page_count, use_proxy, filename=region)
 
-
-def mode_select(dictionary, msg):
-    options = src.enumerate_keys(dictionary)  # flats or houses
-    src.print_dictionary(options)
-    option_key = int(input(c(msg, 'green')))
-    return option_key, options
+    return mode
 
 
 def run(mode, address_0, page_count, use_proxy, filename=''):

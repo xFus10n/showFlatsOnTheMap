@@ -6,6 +6,8 @@ from utilz import functions as f
 from termcolor import colored as c
 from datetime import datetime
 from utilz.aggregations import mean_selling_price as mp
+from utilz.functions import mode_select
+from utilz import sources as src
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
@@ -15,12 +17,19 @@ pd.set_option('display.max_colwidth', None)
 
 
 def main():
+    global mode
+
     if __name__ == '__main__':
-        address_in = pathlib.Path('..').absolute() / 'files/raw'
-        address_out = pathlib.Path('..').absolute() / 'files/clean'
+        option_key, options = mode_select(src.linkz, 'Choose flats or houses : ')
+        mode = options.get(option_key)
+        address_in = pathlib.Path('..')
+        address_out = pathlib.Path('..')
     else:
-        address_in = pathlib.Path('.').absolute() / 'files/raw'
-        address_out = pathlib.Path('.').absolute() / 'files/clean'
+        address_in = pathlib.Path('.')
+        address_out = pathlib.Path('.')
+
+    address_in_x = address_in.absolute() / 'files/raw' / mode
+    address_out_x = address_out.absolute() / 'files/clean' / mode
 
     date_now = datetime.now().strftime("%Y%m%d%H%M%S")
     warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -31,19 +40,22 @@ def main():
         print(c("staging folders found :", "yellow"), c(str(f.bool_2_human(staging_exists)), "red"))
         print(c("system shutdown", "red"))
         exit(1)
-    if len(list(address_in.glob("**/*.csv"))) == 0:
+    if len(list(address_in_x.glob("**/*.csv"))) == 0:
         print(c('Input folder is empty, run load_ss_lv.py script first', 'red'))
         exit(0)
     # log counts and clear drop zone
-    previous_data = f.get_first_file(address_out)
+    previous_data = f.get_first_file(address_out_x)
     if previous_data != '':
         print(c("unique rows before upload: ", "green"),
               c(str(len(pd.read_csv(previous_data, header=0, sep=';'))), "yellow"))
         f.clear_dir(address_out)
     else:
         print(c("unique rows before upload: ", "green"), c(str(0), "yellow"))
-    df_full = f.get_csv_files(address_in)
+    df_full = f.get_csv_files(address_in_x)
     df_full.drop_duplicates(inplace=True, ignore_index=True)
+    print(df_full[:100])
+    exit(0)
+
     df_full = f.refine_date(df_full)
     df_full = f.check_city(df_full)
     df_full = f.set_date_color(df_full)
@@ -56,22 +68,9 @@ def main():
     df_full['price_m2'] = df_full.price_m2.fillna('nan')
 
     df_full['price'] = df_full['price'].fillna('nan')
-    df_full['price_2'] = df_full.price.str.replace("€", "")
-    df_full['price_2'] = df_full.price_2.str.replace("/mēn.", "")
-    df_full['price_2'] = df_full.price_2.str.replace("/dienā", "")
-    df_full['price_2'] = df_full.price_2.str.replace("maiņai", "")
-    df_full['price_2'] = df_full.price_2.str.replace(",", "")
-    df_full['price_2'] = df_full.price_2.str.replace(" ", "")
+    refine_price(df_full)
     df_full = f.convert_2_num(df_full, ['rooms', 'floor', 'top_floor', 'm2', 'price_2', 'price_m2', 'lat', 'long'])
-
-    # price categorisation
-    df_full.loc[df_full['price'].str.contains('nan'), 'com_type'] = 'other'
-    df_full.loc[df_full['price'].str.contains("€"), 'com_type'] = 'sell'
-    df_full.loc[df_full['price'].str.contains("€/mēn"), 'com_type'] = 'rent'
-    df_full.loc[df_full['price'].str.contains("€/dienā"), 'com_type'] = 'rent_by_day'
-    df_full.loc[df_full['price'].str.contains("vēlosīret"), 'com_type'] = 'want_2_rent'
-    df_full.loc[df_full['price'].str.contains("pērku"), 'com_type'] = 'buy'
-    df_full.loc[df_full['price'].str.contains('maiņai'), 'com_type'] = 'change'
+    categorize(df_full)
 
     # mean price for region /house type & round up
     df_full = mp(df_full)
@@ -83,6 +82,25 @@ def main():
     f.save_as_csv(df_full, address_out / f'{date_now}.csv', verbose=True)
     # print(df_full[:1000])
     # exit(0)
+
+
+def refine_price(df_full):
+    df_full['price_2'] = df_full.price.str.replace("€", "")
+    df_full['price_2'] = df_full.price_2.str.replace("/mēn.", "")
+    df_full['price_2'] = df_full.price_2.str.replace("/dienā", "")
+    df_full['price_2'] = df_full.price_2.str.replace("maiņai", "")
+    df_full['price_2'] = df_full.price_2.str.replace(",", "")
+    df_full['price_2'] = df_full.price_2.str.replace(" ", "")
+
+
+def categorize(df_full):
+    df_full.loc[df_full['price'].str.contains('nan'), 'com_type'] = 'other'
+    df_full.loc[df_full['price'].str.contains("€"), 'com_type'] = 'sell'
+    df_full.loc[df_full['price'].str.contains("€/mēn"), 'com_type'] = 'rent'
+    df_full.loc[df_full['price'].str.contains("€/dienā"), 'com_type'] = 'rent_by_day'
+    df_full.loc[df_full['price'].str.contains("vēlosīret"), 'com_type'] = 'want_2_rent'
+    df_full.loc[df_full['price'].str.contains("pērku"), 'com_type'] = 'buy'
+    df_full.loc[df_full['price'].str.contains('maiņai'), 'com_type'] = 'change'
 
 
 if __name__ == "__main__":

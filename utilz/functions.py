@@ -12,6 +12,7 @@ import fpdf
 import plotly.express as px
 import time
 
+from utilz import sources as src
 from utilz.sources import elements_dispatcher, columnz
 
 
@@ -380,3 +381,10 @@ def bool_2_human(true_or_false):
         return 'Yes'
     else:
         return 'No'
+
+
+def mode_select(dictionary, msg):
+    options = src.enumerate_keys(dictionary)  # flats or houses
+    src.print_dictionary(options)
+    option_key = int(input(c(msg, 'green')))
+    return option_key, options

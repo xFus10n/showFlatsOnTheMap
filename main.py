@@ -10,8 +10,9 @@ def main():
         # first stage
         use_proxy = f.needs_proxy()
         load.use_proxy = use_proxy
-        load.main()
+        mode = load.main()
         # second stage
+        clean.mode = mode
         clean.main()
         # third stage
         draw.main()
