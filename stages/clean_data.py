@@ -2,11 +2,11 @@ import pathlib
 import pandas as pd
 import warnings
 
+import utilz.functions
 from utilz import functions as f
 from termcolor import colored as c
 from datetime import datetime
 from utilz.aggregations import mean_selling_price as mp
-from utilz.functions import mode_select
 from utilz import sources as src
 
 pd.set_option('display.max_columns', None)
@@ -20,7 +20,7 @@ def main():
     global mode
 
     if __name__ == '__main__':
-        option_key, options = mode_select(src.linkz, 'Choose flats or houses : ')
+        option_key, options = f.mode_select(src.linkz, 'Choose flats or houses : ')
         mode = options.get(option_key)
         address_in = pathlib.Path('..')
         address_out = pathlib.Path('..')
@@ -53,25 +53,12 @@ def main():
         print(c("unique rows before upload: ", "green"), c(str(0), "yellow"))
     df_full = f.get_csv_files(address_in_x)
     df_full.drop_duplicates(inplace=True, ignore_index=True)
+
+    for transform in utilz.functions.transformation_dispatcher.get(mode):
+        transform(df_full)
+
     print(df_full[:100])
     exit(0)
-
-    df_full = f.refine_date(df_full)
-    df_full = f.check_city(df_full)
-    df_full = f.set_date_color(df_full)
-    df_full = f.split_floor(df_full)
-
-    # price fix
-    df_full = f.split_price(df_full)
-    df_full['price_m2'] = df_full.price_m2.str.replace("€/m²\\)", "")
-    df_full['price_m2'] = df_full.price_m2.str.replace(" ", "")
-    df_full['price_m2'] = df_full.price_m2.fillna('nan')
-
-    df_full['price'] = df_full['price'].fillna('nan')
-    refine_price(df_full)
-    df_full = f.convert_2_num(df_full, ['rooms', 'floor', 'top_floor', 'm2', 'price_2', 'price_m2', 'lat', 'long'])
-    categorize(df_full)
-
     # mean price for region /house type & round up
     df_full = mp(df_full)
     df_full[['mean', 'weight', 'rooms', 'm2', 'flux', 'price_2', 'price_m2']] = df_full[['mean', 'weight', 'rooms', 'm2', 'flux', 'price_2', 'price_m2']].fillna(0)
@@ -82,25 +69,6 @@ def main():
     f.save_as_csv(df_full, address_out / f'{date_now}.csv', verbose=True)
     # print(df_full[:1000])
     # exit(0)
-
-
-def refine_price(df_full):
-    df_full['price_2'] = df_full.price.str.replace("€", "")
-    df_full['price_2'] = df_full.price_2.str.replace("/mēn.", "")
-    df_full['price_2'] = df_full.price_2.str.replace("/dienā", "")
-    df_full['price_2'] = df_full.price_2.str.replace("maiņai", "")
-    df_full['price_2'] = df_full.price_2.str.replace(",", "")
-    df_full['price_2'] = df_full.price_2.str.replace(" ", "")
-
-
-def categorize(df_full):
-    df_full.loc[df_full['price'].str.contains('nan'), 'com_type'] = 'other'
-    df_full.loc[df_full['price'].str.contains("€"), 'com_type'] = 'sell'
-    df_full.loc[df_full['price'].str.contains("€/mēn"), 'com_type'] = 'rent'
-    df_full.loc[df_full['price'].str.contains("€/dienā"), 'com_type'] = 'rent_by_day'
-    df_full.loc[df_full['price'].str.contains("vēlosīret"), 'com_type'] = 'want_2_rent'
-    df_full.loc[df_full['price'].str.contains("pērku"), 'com_type'] = 'buy'
-    df_full.loc[df_full['price'].str.contains('maiņai'), 'com_type'] = 'change'
 
 
 if __name__ == "__main__":

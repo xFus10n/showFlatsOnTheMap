@@ -1,5 +1,7 @@
 import pathlib
 from datetime import datetime
+
+import utilz.functions
 from utilz import functions as f
 from utilz import sources as src
 from termcolor import colored as c
@@ -16,7 +18,7 @@ def main():
     page_count = f.how_many_pages_2_download("enter the number of pages to load: ")
 
     mode = options.get(option_key)
-    links = src.get_links(mode)
+    links = utilz.functions.get_links(mode)
     city_key, city_options = mode_select(links, 'Choose city / region : ')  # user input
 
     if city_key != 0:  # 0 -> all

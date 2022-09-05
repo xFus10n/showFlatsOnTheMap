@@ -1,6 +1,3 @@
-from utilz.PageAttributes import get_city, get_region, get_street, get_rooms, get_area_m2, get_floor, get_house_type, \
-    get_price, get_date, get_location, get_house_rooms, get_outer_area_m2, get_floor_count, get_amenities
-
 flats, houses = ('flats', 'houses')
 
 
@@ -34,25 +31,6 @@ def get_links_for_houses():
             'Jurmala': 'https://www.ss.lv/lv/real-estate/homes-summer-residences/jurmala/all/',
             'Riga-reg': 'https://www.ss.lv/lv/real-estate/homes-summer-residences/riga-region/all/'}
 
-
-def get_links(key):
-    return linkz.get(key)
-
-
-def enumerate_keys(dictionary):
-    sequence = [x for x in range(len(dictionary.keys()))]
-    return dict(zip(sequence, dictionary.keys()))
-
-
-def print_dictionary(dictionary):
-    [print(key, ' : ', val) for key, val in dictionary.items()]
-
-
-elements_dispatcher = {
-    flats: [get_city, get_region, get_street, get_rooms, get_area_m2, get_floor, get_house_type, get_price, get_date,
-            get_location],
-    houses: [get_city, get_region, get_street, get_house_rooms, get_outer_area_m2, get_area_m2, get_floor_count,
-             get_amenities, get_price, get_date, get_location]}
 
 linkz = {flats: get_links_for_flats(), houses: get_links_for_houses()}
 columnz = {

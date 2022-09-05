@@ -12,8 +12,9 @@ import fpdf
 import plotly.express as px
 import time
 
-from utilz import sources as src
-from utilz.sources import elements_dispatcher, columnz
+from utilz.PageAttributes import get_city, get_region, get_street, get_rooms, get_area_m2, get_floor, get_house_type, \
+    get_price, get_date, get_location, get_house_rooms, get_outer_area_m2, get_floor_count, get_amenities
+from utilz.sources import columnz, linkz, flats, houses
 
 
 def plot_barchart(data_frame, x_axis, y_axis, path_out, f_name, p_name, pdf, labels, show_fig=False):
@@ -340,12 +341,10 @@ def load_page(mode, address, page_number, proxy=False):
 def refine_date(df):
     df['date'] = df['date'].str.replace('Datums: ', '')
     df['date'] = pandas.to_datetime(df['date'], format='%d.%m.%Y %H:%M')
-    return df
 
 
 def check_city(df):
     df['city'] = df['city'].fillna('unknown')
-    return df
 
 
 def set_date_color(df):
@@ -356,24 +355,22 @@ def set_date_color(df):
     df.loc[(df['date_diff'] > 1) & (df['date_diff'] <= 2), 'color'] = 'orange'
     df.loc[(df['date_diff'] > 2) & (df['date_diff'] <= 5), 'color'] = 'green'
     df.loc[df['date_diff'] > 5, 'color'] = 'black'
-    return df
 
 
 def split_floor(df):
     df[['floor', 'top_floor']] = df.floor.str.split("/", expand=True)
-    return df
 
 
 def split_price(df):
     df[['price', 'price_m2']] = df.price.str.split("(", expand=True)
-    return df
 
 
-def convert_2_num(data, columns, data_type="float64"):
+def convert_2_num(data, data_type="float64"):
+    columns = ['rooms', 'floor', 'top_floor', 'm2', 'price_2', 'price_m2', 'lat', 'long']
     for column in columns:
-        data[column] = pandas.to_numeric(data[column], errors="coerce")
-        data[column] = data[column].astype(data_type, errors='ignore')
-    return data
+        if column in data.columns:
+            data[column] = pandas.to_numeric(data[column], errors="coerce")
+            data[column] = data[column].astype(data_type, errors='ignore')
 
 
 def bool_2_human(true_or_false):
@@ -384,7 +381,55 @@ def bool_2_human(true_or_false):
 
 
 def mode_select(dictionary, msg):
-    options = src.enumerate_keys(dictionary)  # flats or houses
-    src.print_dictionary(options)
+    options = enumerate_keys(dictionary)  # flats or houses
+    print_dictionary(options)
     option_key = int(input(c(msg, 'green')))
     return option_key, options
+
+
+def fix_m2_price(df_full):
+    df_full['price_m2'] = df_full.price_m2.str.replace("€/m²\\)", "")
+    df_full['price_m2'] = df_full.price_m2.str.replace(" ", "")
+    df_full['price_m2'] = df_full.price_m2.fillna('nan')
+
+
+def refine_price(df_full):
+    df_full['price'] = df_full['price'].fillna('nan')
+    df_full['price_2'] = df_full.price.str.replace("€", "")
+    df_full['price_2'] = df_full.price_2.str.replace("/mēn.", "")
+    df_full['price_2'] = df_full.price_2.str.replace("/dienā", "")
+    df_full['price_2'] = df_full.price_2.str.replace("maiņai", "")
+    df_full['price_2'] = df_full.price_2.str.replace(",", "")
+    df_full['price_2'] = df_full.price_2.str.replace(" ", "")
+
+
+def categorize(df_full):
+    df_full.loc[df_full['price'].str.contains('nan'), 'com_type'] = 'other'
+    df_full.loc[df_full['price'].str.contains("€"), 'com_type'] = 'sell'
+    df_full.loc[df_full['price'].str.contains("€/mēn"), 'com_type'] = 'rent'
+    df_full.loc[df_full['price'].str.contains("€/dienā"), 'com_type'] = 'rent_by_day'
+    df_full.loc[df_full['price'].str.contains("vēlosīret"), 'com_type'] = 'want_2_rent'
+    df_full.loc[df_full['price'].str.contains("pērku"), 'com_type'] = 'buy'
+    df_full.loc[df_full['price'].str.contains('maiņai'), 'com_type'] = 'change'
+
+
+def get_links(key):
+    return linkz.get(key)
+
+
+def enumerate_keys(dictionary):
+    sequence = [x for x in range(len(dictionary.keys()))]
+    return dict(zip(sequence, dictionary.keys()))
+
+
+def print_dictionary(dictionary):
+    [print(key, ' : ', val) for key, val in dictionary.items()]
+
+
+transformation_dispatcher = {flats: [refine_date, check_city, set_date_color, split_floor, split_price, fix_m2_price, refine_price, convert_2_num, categorize],
+                             houses: []}
+elements_dispatcher = {
+    flats: [get_city, get_region, get_street, get_rooms, get_area_m2, get_floor, get_house_type, get_price, get_date,
+            get_location],
+    houses: [get_city, get_region, get_street, get_house_rooms, get_outer_area_m2, get_area_m2, get_floor_count,
+             get_amenities, get_price, get_date, get_location]}
