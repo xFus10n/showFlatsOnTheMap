@@ -14,7 +14,7 @@ import time
 
 from utilz.PageAttributes import get_city, get_region, get_street, get_rooms, get_area_m2, get_floor, get_house_type, \
     get_price, get_date, get_location, get_house_rooms, get_outer_area_m2, get_floor_count, get_amenities
-from utilz.aggregations import mean_selling_price
+from utilz.aggregations import mean_selling_price, find_price_for_m2
 from utilz.sources import columnz, linkz, flats, houses
 
 
@@ -369,7 +369,7 @@ def split_price(df):
 
 
 def convert_2_num(data, data_type="float64"):
-    columns = ['rooms', 'floor', 'top_floor', 'm2', 'price_2', 'price_m2', 'lat', 'long']
+    columns = ['rooms', 'floor', 'top_floor', 'm2', 'price_2', 'price_m2', 'lat', 'long', 'out_m2']
     for column in columns:
         if column in data.columns:
             data[column] = pandas.to_numeric(data[column], errors="coerce")
@@ -434,8 +434,8 @@ def print_dictionary(dictionary):
 
 
 def round_cast_int(df_full):
-    cols2fillna = ['mean', 'weight', 'rooms', 'm2', 'flux', 'price_2', 'price_m2']
-    cols2round_cast_0 = ['mean', 'weight', 'rooms', 'm2', 'price_2', 'price_m2']
+    cols2fillna = ['mean', 'weight', 'rooms', 'm2', 'flux', 'price_2', 'price_m2', 'floor', 'out_m2']
+    cols2round_cast_0 = ['mean', 'weight', 'rooms', 'm2', 'price_2', 'price_m2', 'floor', 'out_m2']
     cols2round_cast_2 = ['flux']
 
     for col in cols2fillna:
@@ -451,7 +451,7 @@ def round_cast_int(df_full):
 
 
 transformation_dispatcher = {flats: [refine_date, check_city, set_date_color, split_floor, split_price, fix_m2_price, refine_price, convert_2_num, categorize, mean_selling_price, round_cast_int],
-                             houses: []}
+                             houses: [refine_date, check_city, set_date_color, refine_price, convert_2_num, find_price_for_m2, categorize, mean_selling_price, round_cast_int]}
 elements_dispatcher = {
     flats: [get_city, get_region, get_street, get_rooms, get_area_m2, get_floor, get_house_type, get_price, get_date,
             get_location],

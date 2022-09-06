@@ -7,7 +7,6 @@ from utilz import functions as f
 from termcolor import colored as c
 from datetime import datetime
 from utilz import sources as src
-from utilz.functions import round_cast_int
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
