@@ -14,6 +14,7 @@ import time
 
 from utilz.PageAttributes import get_city, get_region, get_street, get_rooms, get_area_m2, get_floor, get_house_type, \
     get_price, get_date, get_location, get_house_rooms, get_outer_area_m2, get_floor_count, get_amenities
+from utilz.aggregations import mean_selling_price
 from utilz.sources import columnz, linkz, flats, houses
 
 
@@ -235,15 +236,12 @@ def update_xcell(data_frame, file_name, sheet_name):
         data_frame.to_excel(file_name, engine='openpyxl', sheet_name=sheet_name, index=False)
 
 
-def save_as_csv(data_frame, name_path, verbose=False):
-    location = pathlib.Path(name_path)
-    if location.exists():
-        data_frame.to_csv(name_path, index=False, encoding='utf8', mode='a', header=False, sep=';')
-    else:
-        data_frame.to_csv(name_path, index=False, encoding='utf8', mode='a', header=True, sep=';')
+def save_as_csv(data_frame, filename, verbose=False):
+    filename.parents[0].mkdir(parents=True, exist_ok=True)
+    data_frame.to_csv(filename, index=False, encoding='utf8', mode='a', header=True, sep=';')
     if verbose:
         print(c(f"Saved data under ", "blue"), end=" : ")
-        print(c(f"{name_path}", "yellow"))
+        print(c(f"{filename.parts[-2]} / {filename.name}", "yellow"))
 
 
 def list_of_df_to_csv(df_list, filename):
@@ -341,10 +339,12 @@ def load_page(mode, address, page_number, proxy=False):
 def refine_date(df):
     df['date'] = df['date'].str.replace('Datums: ', '')
     df['date'] = pandas.to_datetime(df['date'], format='%d.%m.%Y %H:%M')
+    return df
 
 
 def check_city(df):
     df['city'] = df['city'].fillna('unknown')
+    return df
 
 
 def set_date_color(df):
@@ -355,14 +355,17 @@ def set_date_color(df):
     df.loc[(df['date_diff'] > 1) & (df['date_diff'] <= 2), 'color'] = 'orange'
     df.loc[(df['date_diff'] > 2) & (df['date_diff'] <= 5), 'color'] = 'green'
     df.loc[df['date_diff'] > 5, 'color'] = 'black'
+    return df
 
 
 def split_floor(df):
     df[['floor', 'top_floor']] = df.floor.str.split("/", expand=True)
+    return df
 
 
 def split_price(df):
     df[['price', 'price_m2']] = df.price.str.split("(", expand=True)
+    return df
 
 
 def convert_2_num(data, data_type="float64"):
@@ -371,6 +374,7 @@ def convert_2_num(data, data_type="float64"):
         if column in data.columns:
             data[column] = pandas.to_numeric(data[column], errors="coerce")
             data[column] = data[column].astype(data_type, errors='ignore')
+    return data
 
 
 def bool_2_human(true_or_false):
@@ -391,6 +395,7 @@ def fix_m2_price(df_full):
     df_full['price_m2'] = df_full.price_m2.str.replace("€/m²\\)", "")
     df_full['price_m2'] = df_full.price_m2.str.replace(" ", "")
     df_full['price_m2'] = df_full.price_m2.fillna('nan')
+    return df_full
 
 
 def refine_price(df_full):
@@ -401,6 +406,7 @@ def refine_price(df_full):
     df_full['price_2'] = df_full.price_2.str.replace("maiņai", "")
     df_full['price_2'] = df_full.price_2.str.replace(",", "")
     df_full['price_2'] = df_full.price_2.str.replace(" ", "")
+    return df_full
 
 
 def categorize(df_full):
@@ -411,6 +417,7 @@ def categorize(df_full):
     df_full.loc[df_full['price'].str.contains("vēlosīret"), 'com_type'] = 'want_2_rent'
     df_full.loc[df_full['price'].str.contains("pērku"), 'com_type'] = 'buy'
     df_full.loc[df_full['price'].str.contains('maiņai'), 'com_type'] = 'change'
+    return df_full
 
 
 def get_links(key):
@@ -426,7 +433,24 @@ def print_dictionary(dictionary):
     [print(key, ' : ', val) for key, val in dictionary.items()]
 
 
-transformation_dispatcher = {flats: [refine_date, check_city, set_date_color, split_floor, split_price, fix_m2_price, refine_price, convert_2_num, categorize],
+def round_cast_int(df_full):
+    cols2fillna = ['mean', 'weight', 'rooms', 'm2', 'flux', 'price_2', 'price_m2']
+    cols2round_cast_0 = ['mean', 'weight', 'rooms', 'm2', 'price_2', 'price_m2']
+    cols2round_cast_2 = ['flux']
+
+    for col in cols2fillna:
+        if col in df_full.columns: df_full[col] = df_full[col].fillna(0)
+
+    for col in cols2round_cast_0:
+        if col in df_full.columns: df_full[col] = df_full[col].round(0).astype(int)
+
+    for col in cols2round_cast_2:
+        if col in df_full.columns: df_full[col] = df_full[col].round(2)
+
+    return df_full
+
+
+transformation_dispatcher = {flats: [refine_date, check_city, set_date_color, split_floor, split_price, fix_m2_price, refine_price, convert_2_num, categorize, mean_selling_price, round_cast_int],
                              houses: []}
 elements_dispatcher = {
     flats: [get_city, get_region, get_street, get_rooms, get_area_m2, get_floor, get_house_type, get_price, get_date,

@@ -6,8 +6,8 @@ import utilz.functions
 from utilz import functions as f
 from termcolor import colored as c
 from datetime import datetime
-from utilz.aggregations import mean_selling_price as mp
 from utilz import sources as src
+from utilz.functions import round_cast_int
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
@@ -48,25 +48,17 @@ def main():
     if previous_data != '':
         print(c("unique rows before upload: ", "green"),
               c(str(len(pd.read_csv(previous_data, header=0, sep=';'))), "yellow"))
-        f.clear_dir(address_out)
+        f.clear_dir(address_out_x)
     else:
         print(c("unique rows before upload: ", "green"), c(str(0), "yellow"))
     df_full = f.get_csv_files(address_in_x)
     df_full.drop_duplicates(inplace=True, ignore_index=True)
 
     for transform in utilz.functions.transformation_dispatcher.get(mode):
-        transform(df_full)
-
-    print(df_full[:100])
-    exit(0)
-    # mean price for region /house type & round up
-    df_full = mp(df_full)
-    df_full[['mean', 'weight', 'rooms', 'm2', 'flux', 'price_2', 'price_m2']] = df_full[['mean', 'weight', 'rooms', 'm2', 'flux', 'price_2', 'price_m2']].fillna(0)
-    df_full[['mean', 'weight', 'rooms', 'm2', 'price_2', 'price_m2']] = df_full[['mean', 'weight', 'rooms', 'm2', 'price_2', 'price_m2']].round(0).astype(int)
-    df_full['flux'] = df_full['flux'].round(2)
+        df_full = transform(df_full)
 
     print(c("unique rows after upload: ", "green"), c(str(len(df_full)), "yellow"))
-    f.save_as_csv(df_full, address_out / f'{date_now}.csv', verbose=True)
+    f.save_as_csv(df_full, address_out_x / f'{date_now}.csv', verbose=True)
     # print(df_full[:1000])
     # exit(0)
 
