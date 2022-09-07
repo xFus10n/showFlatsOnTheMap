@@ -49,8 +49,8 @@ def log_dataframe(data_frame, caption, select_columns, pdf, new_page=False):
     # add_item_to_pdf(pdf, '', 40, 10, new_page=new_page)  # Space
 
 
-def log_dataframe_with_geo_data(data_frame, out_path, caption, html_name, pdf, new_page=False):
-    q_path = create_map_html(data_frame, str(out_path), html_name)
+def log_dataframe_with_geo_data(data_frame, out_path, caption, html_name, pdf, mode, new_page=False):
+    q_path = create_map_html(data_frame, str(out_path), html_name, mode)
     add_item_to_pdf(pdf, caption, 40, 10, new_page=new_page)  # Caption
     log_data_pdf(pdf, drop_col(data_frame, ['lat', 'long']))
     add_item_to_pdf(pdf, q_path, 20, 10, is_link=True, link_msg=html_name)  # link to map
@@ -133,21 +133,14 @@ def get_proxies():
     }
 
 
-def create_map_html(data_frame, path_2_analytical_dir, name):
+def create_map_html(data_frame, path_2_analytical_dir, name, mode):
     full_html_name = ''
     data_frame_clear = data_frame.dropna()
     if len(data_frame_clear) == 0:
         print(c("error deleting NaNs", "red"))
         exit(1)
     df = data_frame_clear.copy()
-    df['info'] = '<b>Commercial Type:</b> ' + df['com_type'].map(str) + ',<br>'\
-                 + '<b>Location:</b> ' + df['street'].map(str) + ',<br>'\
-                 + '<b>Building Type:</b> ' + df['house_type'].map(str) + ',<br>'\
-                 + '<b>Area:</b> ' + df['m2'].map(str) + '(m2),<br>'\
-                 + '<b>Price:</b> ' + df['price_2'].map(str) + '(EUR),<br>'\
-                 + '<b>Flux:</b> ' + df['flux'].map(str) + ',<br>'\
-                 + '<b>Date:</b> ' + df['date'].map(str) + ',<br>'\
-                 + '<b>Link:</b> <a href="' + df['link'].map(str) + '" target="_blank">source</a>'
+    df['info'] = build_msg_popup(df, mode)
     try:
         mapx = folium.Map(location=[df.lat.mean(), df.long.mean()], zoom_start=14, control_scale=True)
         for index, location_info in df.iterrows():
@@ -161,6 +154,34 @@ def create_map_html(data_frame, path_2_analytical_dir, name):
         print(e)
         pass
     return full_html_name
+
+
+def build_msg_popup(df, mode):
+    if mode == flats:
+        return '<b>Commercial Type:</b> ' + df['com_type'].map(str) + ',<br>' \
+               + '<b>Location:</b> ' + df['street'].map(str) + ',<br>' \
+               + '<b>Building Type:</b> ' + df['house_type'].map(str) + ',<br>' \
+               + '<b>Area:</b> ' + df['m2'].map(str) + '(m2),<br>' \
+               + '<b>Price:</b> ' + df['price_2'].map(str) + '(EUR),<br>' \
+               + '<b>Flux:</b> ' + df['flux'].map(str) + ',<br>' \
+               + '<b>Date:</b> ' + df['date'].map(str) + ',<br>' \
+               + '<b>Link:</b> <a href="' + df['link'].map(str) + '" target="_blank">source</a>'
+    else:
+        return '<b>Commercial Type:</b> ' + df['com_type'].map(str) + ',<br>' \
+               + '<b>Location:</b> ' + df['street'].map(str) + ',<br>' \
+               + '<b>Area:</b> ' + df['m2'].map(str) + '(m2),<br>' \
+               + '<b>Outer Area:</b> ' + df['out_m2'].map(str) + '(m2),<br>' \
+               + '<b>Price:</b> ' + df['price_2'].map(str) + '(EUR),<br>' \
+               + '<b>Flux:</b> ' + df['flux'].map(str) + ',<br>' \
+               + '<b>Date:</b> ' + df['date'].map(str) + ',<br>' \
+               + '<b>Link:</b> <a href="' + df['link'].map(str) + '" target="_blank">source</a>'
+
+
+# def crete_msg_popup(df, columns):
+#     output = ""
+#     for col in columns:
+#         if col in df.columns:
+#             output = output + ...
 
 
 def drop_col(data_frame, columns):
