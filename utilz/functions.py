@@ -313,7 +313,7 @@ def load_page(mode, address, page_number, proxy=False):
 
     # check if page are the same, not -> reached end
     if page.url != address:
-        print(c("\nreached the end of pages, stopping", "yellow"))
+        print(c("\nReached end of pages   :", "yellow"), c("stopping", "green"))
         return 0, None
 
     info = []  # info holder
@@ -353,7 +353,7 @@ def load_page(mode, address, page_number, proxy=False):
     df = create_dataframe(info, columnz.get(mode))
 
     # print(df)
-    print(c(f"\rConnection success:", "yellow"), c(f"page: {page_number} loaded ...", "green"), end='')
+    print(c(f"\rConnection success     :", "yellow"), c(f"page: {page_number} loaded ...", "green"), end='')
     return 1, df
 
 

@@ -33,7 +33,6 @@ def main():
 
 
 def run(mode, address_0, page_count, use_proxy, filename=''):
-
     # starting page
     page = 1
 
@@ -47,10 +46,11 @@ def run(mode, address_0, page_count, use_proxy, filename=''):
     date_now = datetime.now().strftime("%Y%m%d")
 
     if location_out.exists():
-        print(c("staging folder founded :", "yellow"), c(str(f.bool_2_human(location_out.exists())), "green"))
+        print(c("Staging folder founded :", "yellow"), c(str(f.bool_2_human(location_out.exists())), "green"))
+        print(c("Starting               :", "yellow"), c(mode, "green"))
     else:
-        print(c("staging folder found :", "yellow"), c(str(f.bool_2_human(location_out.exists())), "red"))
-        print(c("system shutdown", "red"))
+        print(c("Staging folder found :", "yellow"), c(str(f.bool_2_human(location_out.exists())), "red"))
+        print(c("System shutdown", "red"))
         exit(1)
     # will exit after the last page
     df_list = []
@@ -67,7 +67,8 @@ def run(mode, address_0, page_count, use_proxy, filename=''):
         else:  # reached the end of pages
             break
     f.list_of_df_to_csv(df_list, output)
-    print(c(f"\nSaved {filename}.csv successfully", "blue"))
+    print(c(f"\nSaved                  :", "blue"), c(f"{date_now}/{filename}.csv", "green"))
+    print()
 
 
 if __name__ == "__main__":

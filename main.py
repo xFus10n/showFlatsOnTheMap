@@ -2,6 +2,7 @@ import stages.clean_data as clean
 import stages.show_street as draw
 import stages.load_ss_lv as load
 import utilz.functions as f
+import utilz.sources as src
 
 
 def main():
@@ -14,14 +15,14 @@ def main():
         mode = load.main()
 
         # second stage
-        clean.mode = mode
-        clean.main()
+        clean.main(mode=mode)
 
         # third stage
-        draw.mode = mode
-        draw.main()
+        draw.main(mode=mode)
     else:
-        draw.main()
+        option_key, options = f.mode_select(src.linkz, 'Choose flats or houses : ')
+        mode = options.get(option_key)
+        draw.main(mode)
 
 
 if __name__ == '__main__':

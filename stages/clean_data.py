@@ -15,8 +15,8 @@ pd.set_option('display.max_colwidth', None)
 # pd.set_option('display.precision', 10)
 
 
-def main():
-    global mode
+def main(mode=None):
+    # global mode
 
     if __name__ == '__main__':
         option_key, options = f.mode_select(src.linkz, 'Choose flats or houses : ')

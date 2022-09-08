@@ -11,8 +11,8 @@ pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 
 
-def main():
-    global mode
+def main(mode=None):
+    # global mode
 
     # get path to our cleaned file
     if __name__ == '__main__':
