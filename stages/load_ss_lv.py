@@ -47,7 +47,7 @@ def run(mode, address_0, page_count, use_proxy, filename=''):
 
     if location_out.exists():
         print(c("Staging folder founded :", "yellow"), c(str(f.bool_2_human(location_out.exists())), "green"))
-        print(c("Starting               :", "yellow"), c(mode, "green"))
+        print(c("Starting               :", "yellow"), c(filename, "green"))
     else:
         print(c("Staging folder found :", "yellow"), c(str(f.bool_2_human(location_out.exists())), "red"))
         print(c("System shutdown", "red"))
@@ -67,7 +67,7 @@ def run(mode, address_0, page_count, use_proxy, filename=''):
         else:  # reached the end of pages
             break
     f.list_of_df_to_csv(df_list, output)
-    print(c(f"\nSaved                  :", "blue"), c(f"{date_now}/{filename}.csv", "green"))
+    print(c(f"Saved                  :", "blue"), c(f"{date_now}/{filename}.csv", "green"))
     print()
 
 
