@@ -63,6 +63,7 @@ def run(mode, address_0, page_count, use_proxy, filename=''):
             if page < page_count:
                 page += 1
             else:  # reached the end of requested pages
+                print()  # new line for save msg
                 break
         else:  # reached the end of pages
             break
