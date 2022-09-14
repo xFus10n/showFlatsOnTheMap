@@ -50,7 +50,10 @@ def main(mode=None):
     # ask for region input
     df_out, regions = agg.get_streets_short(df_full)
     print(regions)
-    position = input(c(f"Choose region: ", "green"))
+    position = input(c(f"Choose region: ", "green")) or None
+    if position is None:
+        log_me(address_out, columnz, df_out, key_city, mode, pdf)
+        exit(0)
     key_reg = regions.iloc[[position]].tolist()[0]
     df_reg = df_out.query(f'region == "{key_reg}"')
 
@@ -59,8 +62,8 @@ def main(mode=None):
     df_street.index.names = ['index']
     print(df_street)
 
-    position = input(c(f"Choose street ", "green") + c("(empty = all)", "blue") + c(" : ", "green"))
-    position = int(position) if position.isdigit() else None
+    position = input(c(f"Choose street ", "green") + c("(empty = all)", "blue") + c(" : ", "green")) or None
+    # position = int(position) if position.isdigit() else None
 
     # show results
     if position is None:
@@ -68,6 +71,10 @@ def main(mode=None):
     else:
         key = df_street['street_short'].iloc[[position]].tolist()[0]
         df = df_reg.query(f'street_short == "{key}"')
+    log_me(address_out, columnz, df, key_reg, mode, pdf)
+
+
+def log_me(address_out, columnz, df, key_reg, mode, pdf):
     f.log_dataframe_with_geo_data(df[columnz], address_out, str(key_reg).upper(), 'show_map', pdf, mode, new_page=True)
     pdf.output(address_out / 'data.pdf')
 
