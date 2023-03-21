@@ -9,8 +9,7 @@ from termcolor import colored as c
 from utilz.functions import mode_select
 
 
-def main():
-    global use_proxy
+def main(use_proxy):
 
     # user inputs
     option_key, options = mode_select(src.linkz, 'Choose flats or houses : ')
@@ -73,4 +72,4 @@ def run(mode, address_0, page_count, use_proxy, filename=''):
 
 
 if __name__ == "__main__":
-    main()
+    main(None)

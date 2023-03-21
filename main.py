@@ -10,9 +10,9 @@ def main():
     if download_new_data:
 
         # first stage
-        use_proxy = f.needs_proxy()
-        load.use_proxy = use_proxy
-        mode = load.main()
+        # use_proxy = f.needs_proxy()
+        # load.use_proxy = use_proxy
+        mode = load.main(f.needs_proxy())
 
         # second stage
         clean.main(mode=mode)
