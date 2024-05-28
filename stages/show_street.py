@@ -43,15 +43,16 @@ def main(mode=None):
     # ask for city
     df_cities = df_full['city'].drop_duplicates().reset_index(drop=True)
     print(df_cities)
-    position = input(c(f"Choose city: ", "green"))
+    position = input(c(f"Choose city: ", "green")) or 0
     key_city = df_cities.iloc[[position]].tolist()[0]
     df_full = df_full.query(f'city == "{key_city}"')
 
     # ask for region input
     df_out, regions = agg.get_streets_short(df_full)
     print(regions)
-    position = input(c(f"Choose region: ", "green")) or None
+    position = input(c(f"Choose region: ", "green") + c("(empty = all)", "blue") + c(" : ", "green")) or None
     if position is None:
+        df_out = df_out[df_out["color"].isin(["red", "orange", "green"])]
         log_me(address_out, columnz, df_out, key_city, mode, pdf)
         exit(0)
     key_reg = regions.iloc[[position]].tolist()[0]
@@ -75,7 +76,8 @@ def main(mode=None):
 
 
 def log_me(address_out, columnz, df, key_reg, mode, pdf):
-    f.log_dataframe_with_geo_data(df[columnz], address_out, str(key_reg).upper(), 'show_map', pdf, mode, new_page=True)
+    title = "<NA>" if key_reg is None else key_reg
+    f.log_dataframe_with_geo_data(df[columnz], address_out, str(title).upper(), 'show_map', pdf, mode, new_page=True)
     pdf.output(address_out / 'data.pdf')
 
 
