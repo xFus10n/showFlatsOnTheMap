@@ -4,6 +4,5 @@ fpdf==1.7.2
 kaleido==0.2.1
 pandas==1.4.2
 plotly==5.7.0
-pyspark==3.0.0
-requests==2.27.1
+requests==2.31.0
 termcolor==1.1.0

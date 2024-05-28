@@ -4,6 +4,7 @@ Project is written in a python and data source was ss.lv
 
 ### Installation
 
+Pyrthon version: 3.11.
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install 
 all required libraries. Assuming, *readme.md* location is
 current active directory. Then command to install dependencies:
@@ -31,13 +32,13 @@ These folders being used for data processing.
 
 **NOTE: If your connection is under proxy, re-implement *utilz.functions.get_proxies* function** 
 
-* ###Load
+* ### Load
   For data download run [load](stages/load_ss_lv.py) script.
   User can specify a file name, number of pages to download and either the connection is under proxy.
   Proxies can be specified in here : **./utilz/functions.get_proxies**. Multiple
   files allowed (deduplication happens on the next stage). If number of pages are less than user have specified, script will stop 
   downloading at the last available page.
-* ###Clean/Transform
+* ### Clean/Transform
   For data cleansing/transforming run [clean](stages/clean_data.py) script.
   Output folder will be erased before saving new file.
 * ###Analyse
@@ -45,5 +46,5 @@ These folders being used for data processing.
   connection requires proxy and wether you wan to pop up the plots. The output files will be
   saved in *analytical* folder. The folder will be cleared prior saving. Summary can be found in 
   *data.pdf* file. NOTE: There are clickable areas on the pdf for maps pop-up (*top_10_sell_map, top_10_rent_map, top_10_rent_day_map*)
-* ###main
+* ### main
   Runs all stages

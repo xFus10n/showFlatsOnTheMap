@@ -369,7 +369,8 @@ def check_city(df):
 
 
 def set_date_color(df):
-    current_date = pandas.datetime.now()
+    # current_date = pandas.datetime.now()
+    current_date = pandas.Timestamp.now()
     df['date_diff'] = current_date - df['date']
     df['date_diff'] = df['date_diff'] / numpy.timedelta64(1, 'D')
     df.loc[df['date_diff'] <= 1, 'color'] = 'red'
