@@ -3,6 +3,7 @@ import stages.show_street as draw
 import stages.load_ss_lv as load
 import utilz.functions as f
 import utilz.sources as src
+import pandas
 
 
 def main():
