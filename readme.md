@@ -4,6 +4,7 @@ Project is written in a python and data source was ss.lv
 
 ### Installation
 
+Pyrthon version: 3.11.
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install 
 all required libraries. Assuming, *readme.md* location is
 current active directory. Then command to install dependencies:
